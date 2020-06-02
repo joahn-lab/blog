@@ -1,0 +1,326 @@
+
+   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+     <channel>
+       <title>Posts on Joahn-lab</title>
+       <link>/post/</link>
+       <description>Recent content in Posts on Joahn-lab</description>
+       <generator>Hugo -- gohugo.io</generator>
+       <copyright>Copyright &amp;copy; 2019 - Author Name</copyright>
+       <lastBuildDate>Tue, 02 Jun 2020 00:00:00 +0000</lastBuildDate>
+       
+           <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+       
+       
+       <item>
+         <title>sotu_text_analysis</title>
+         <link>/2020/06/02/sotu-text-analysis/</link>
+         <pubDate>Tue, 02 Jun 2020 00:00:00 +0000</pubDate>
+         
+         <guid>/2020/06/02/sotu-text-analysis/</guid>
+         <description>
+
+
+&lt;div id=&#34;도입&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;도입&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div id=&#34;데이터-호출-및-전처리&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;데이터 호출 및 전처리&lt;/h1&gt;
+&lt;p&gt;UC Santa Barbara의 ‘The American Presidency project’에서는 매해 단위로 수집한 역대 미국 대통령의 의회 국정연설문을 텍스트 데이터로 아카이빙하고 있다. ’State of the Union’(SOTU) 데이터셋이 바로 그것인데, 초대 대통령 조지 워싱턴(1789~1797 재임)부터 45대 대통령 도널드 트럼프(2017~)의 구두/서면 연설문이 txt 파일 형태로 정리되어 있다. URL 역시 크롤링하기 간편한 규칙성을 띠고 있어 txt 파일데이터 전량을 손쉽게 크롤링할 수 있다.
+URL 링크 접근과 크롤링을 위해 정리된 메타데이터 엑셀 파일과, 정리된 연설문 파일을 불러오는 것부터 시작하자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+library(tidytext)
+library(tm)
+library(quanteda)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;list.files()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;stu = read.csv(&amp;quot;STU_address_metadata.csv&amp;quot;,header=T) %&amp;gt;% as_tibble()
+head(stu)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 8
+##   label href           president  president_no years  title        date   doc_id
+##   &amp;lt;fct&amp;gt; &amp;lt;fct&amp;gt;          &amp;lt;fct&amp;gt;      &amp;lt;fct&amp;gt;        &amp;lt;fct&amp;gt;  &amp;lt;fct&amp;gt;        &amp;lt;fct&amp;gt;   &amp;lt;int&amp;gt;
+## 1 2017  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      1
+## 2 2018  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Janua~      2
+## 3 2019  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      3
+## 4 2020  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      4
+## 5 2013  https://www.p~ Barack Ob~ 44th         2009 ~ Address Bef~ Febru~      5
+## 6 2014  https://www.p~ Barack Ob~ 44th         2009 ~ Address Bef~ Janua~      6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이번 텍스트 데이터 전처리는 tidytext 패키지의 unnest_tokens() 함수를 이용한다. 연설문 텍스트 파일을 tibble 형태로 불러온 후, 연결된 문장을 단어별로 구획해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;doc_1 = read_lines(&amp;quot;doc_1.txt&amp;quot;) %&amp;gt;% as_tibble() %&amp;gt;% 
+  unnest_tokens(words, value, token=&amp;quot;words&amp;quot;)
+
+head(doc_1, n = 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 10 x 1
+##    words    
+##    &amp;lt;chr&amp;gt;    
+##  1 thank    
+##  2 you      
+##  3 very     
+##  4 much     
+##  5 mr       
+##  6 speaker  
+##  7 mr       
+##  8 vice     
+##  9 president
+## 10 members&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;평균-단어-수-계산&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;평균 단어 수 계산&lt;/h1&gt;
+&lt;p&gt;보기와 같이 띄어쓰기를 기준으로 한 어절 단위로 연설문이 처리되었음을 알 수 있다. 이제 우리는 해당 텍스트 데이터의 기본적인 분석에 착수할 수 있다. 우선 연설문당 평균 단어수를 계산해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tmp = stu %&amp;gt;% as_tibble() %&amp;gt;%
+  select(president, doc_id, president_no) %&amp;gt;%
+  arrange(doc_id)
+
+wnum = list()
+for (i in 1:max(tmp$doc_id)){
+  doc_n = read_lines(str_c(&amp;quot;C:/Users/Byeongjun Cho/Desktop/2020-1/데이터사이언스입문/data/STU_address/doc_&amp;quot;,as.character(i),&amp;quot;.txt&amp;quot;)) %&amp;gt;% as_tibble %&amp;gt;%
+    unnest_tokens(words, value, token = &amp;quot;words&amp;quot;)
+  wnum = bind_rows(wnum, count(doc_n))
+}
+anyNA(cbind(tmp, wnum))
+A1 = cbind(tmp, wnum) %&amp;gt;% as_tibble
+
+meanword = list()
+mw = list()
+pname = list()
+tmpname = list()
+for (i in 1:42){
+mw = mean(A1$n[A1$president == unique(A1$president)[i]])
+meanword[[i]] = mw
+tmpname = as.character(unique(A1$president)[i])
+pname[[i]] = tmpname
+}
+a = as.data.frame(cbind(meanword, pname))
+a = a[nrow(a):1,]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이때 22대, 24대 대통령은 ’Grover Cleveland’로, 연속 연임 대통령이 아닌 유일한 2선 대통령이므로 별도의 전처리를 거쳐야 한다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(mean(A1$n[A1$president_no == &amp;quot;22nd&amp;quot;]),0) # 22대 대통령 재임시절 Cleveland&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 13401&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(mean(A1$n[A1$president_no == &amp;quot;24th&amp;quot;]),0) # 24대 대통령 재임시절 Cleveland&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 14652&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;a$meanword[21] == as.numeric(a$meanword[a$pname == &amp;quot;Grover Cleveland&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;b = round(as.numeric(a$meanword[-21])) %&amp;gt;% as_tibble()
+c = b[1:19,]
+c[20:22, ] = c(13401, 13668, 14652)
+c[23:43,] = b[21:41,]&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;인칭대명사-사용-빈도-계산&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;인칭대명사 사용 빈도 계산&lt;/h2&gt;
+&lt;p&gt;1~3인칭 단/복수 인칭대명사의 빈도 역시 우리에게 많은 것을 알려줄 수 있다. 대통령별 각 대명사의 사용 빈도를 알아보자. 이때 unnest_token() 함수로 구분된 어절은 모두 소문자로 시작하므로 결측을 배제하기 위한 별도의 전처리가 필요 없다. 대명사 종류별 수집할 어휘는 다음과 같다. (2인칭의 경우 단/복수 형태의 구분이 없으므로 함께 고려한다.)&lt;/p&gt;
+&lt;p&gt;1인칭 단수 : i, my, me, mine
+1인칭 복수 : we, us, our, ours
+2인칭 단수/복수 : you, your, yours
+3인칭 단수 : he, she, his, her, him
+3인칭 복수 : they, their, them, theirs&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tmp_2 = tibble()
+for (i in 1:max(tmp$doc_id)){
+  doc_n = read_lines(str_c(&amp;quot;doc_&amp;quot;,as.character(i),&amp;quot;.txt&amp;quot;)) %&amp;gt;% as_tibble %&amp;gt;%
+    unnest_tokens(words, value, token = &amp;quot;words&amp;quot;)
+  tmp_2[i,1] = nrow(doc_n)
+  tmp_2[i,2] = sum(length(doc_n$words[doc_n$words == &amp;quot;i&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;my&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;me&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;mine&amp;quot;]))
+  tmp_2[i,3] = sum(length(doc_n$words[doc_n$words == &amp;quot;we&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;our&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;us&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;ours&amp;quot;]))
+  tmp_2[i,4] = sum(length(doc_n$words[doc_n$words == &amp;quot;you&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;your&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;yours&amp;quot;]))
+  tmp_2[i,5] = sum(length(doc_n$words[doc_n$words == &amp;quot;he&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;she&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;his&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;her&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;him&amp;quot;]))
+  tmp_2[i,6] = sum(length(doc_n$words[doc_n$words == &amp;quot;they&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;their&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;them&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;theirs&amp;quot;]))
+}
+A2 = inner_join(A1, tmp_2, c(&amp;quot;n&amp;quot;=&amp;quot;...1&amp;quot;)) %&amp;gt;% unique()
+
+head(A2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 9
+##   president       doc_id president_no     n  ...2  ...3  ...4  ...5  ...6
+##   &amp;lt;fct&amp;gt;            &amp;lt;int&amp;gt; &amp;lt;fct&amp;gt;        &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt;
+## 1 Donald J. Trump      1 45th          5096    54   237    29    29    60
+## 2 Donald J. Trump      2 45th          5926    51   253    52    62    80
+## 3 Donald J. Trump      3 45th          5798    63   230    47    42    47
+## 4 Donald J. Trump      4 45th          6387    81   199    91    65    33
+## 5 Barack Obama         5 44th          6897    46   299    22    33    69
+## 6 Barack Obama         6 44th          7114    74   235    30    56    71&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A2_1 = tibble()
+A2_1 = A2 %&amp;gt;%
+  mutate(...2 = 100*...2/n,
+         ...3 = 100*...3/n,
+         ...4 = 100*...4/n,
+         ...5 = 100*...5/n,
+         ...6 = 100*...6/n)
+
+A2_2 = tibble()
+for (i in 1:42){
+  A2_2[i,1] = unique(A2_1$president)[i]
+  A2_2[i,2] = round(mean(A2_1$n[A2_1$president == unique(A2_1$president)[i]]),0)
+  A2_2[i,3] = round(mean(A2_1$...2[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,4] = round(mean(A2_1$...3[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,5] = round(mean(A2_1$...4[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,6] = round(mean(A2_1$...5[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,7] = round(mean(A2_1$...6[A2_1$president == unique(A2_1$president)[i]]),2)
+  } 
+A2_2[22,] ## Grover Cleveland
+A2_2 = A2_2[-22,]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A2_2 %&amp;gt;%
+  mutate(rown = row_number()) %&amp;gt;% arrange(desc(rown)) %&amp;gt;%
+  rename(&amp;quot;president&amp;quot; = ...1, &amp;quot;totalwords&amp;quot; = ...2, &amp;quot;I&amp;quot; = ...3, &amp;quot;we&amp;quot; = ...4, &amp;quot;you&amp;quot; = ...5, &amp;quot;he/she&amp;quot; = ...6,          &amp;quot;they&amp;quot; = ...7)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 41 x 8
+##    president         totalwords     I    we   you `he/she`  they  rown
+##    &amp;lt;fct&amp;gt;                  &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
+##  1 George Washington       2082 1.04   1.25  0.83     0.17  1.18    41
+##  2 John Adams              1789 0.9    1.81  0.56     0.31  1.16    40
+##  3 Thomas Jefferson        2584 0.47   2.4   0.53     0.2   1.77    39
+##  4 James Madison           2711 0.34   1.38  0.17     0.51  0.98    38
+##  5 James Monroe            5290 0.32   1.25  0.12     0.36  1.19    37
+##  6 John Quincy Adams       7774 0.18   1.15  0.1      0.32  1.28    36
+##  7 Andrew Jackson         11273 0.84   1.32  0.27     0.37  1.11    35
+##  8 Martin van Buren       11365 0.56   0.83  0.23     0.16  1.34    34
+##  9 John Tyler              8517 0.570  0.73  0.32     0.45  0.75    33
+## 10 James K. Polk          18054 0.39   1.28  0.12     0.84  1.25    32
+## # ... with 31 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;시각화&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;시각화&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;대통령별-평균-단어-수-시각화&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;대통령별 평균 단어 수 시각화&lt;/h1&gt;
+&lt;p&gt;우선 처음에 구한 대통령별 연설문 평균 단어 수를 시각화해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A3_1 = A3_1 %&amp;gt;% 
+  mutate(president_no = str_extract(president_no,&amp;quot;[[:digit:]]{1,2}&amp;quot;),
+         president_no = as.numeric(president_no))
+
+A3_1 %&amp;gt;%
+  ggplot(aes(x = 46-president_no, y = value)) +
+  geom_point(size = 2) +
+  geom_line() +
+  labs(x=&amp;quot;President of the United States&amp;quot;,
+       y=&amp;quot;Average number of words addressed&amp;quot;) +
+  ylim(c(1000,25000)) +
+  scale_x_continuous(breaks=46-A3_1$president_no,
+                     labels=A3_1$president) +
+  theme(axis.text.x.bottom = element_text(angle = 45)) +
+  theme_light()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;이때, 대통령별 변화량에 주목하기보다 시대 변화에 따른 추이를 보고 싶다면 축을 세로로 돌리면 좀 더 보기 편할 것이다. ggplot 패키지의 coord_flip() 함수를 이용하면 된다. 추가적으로 추세선과 함께 그래프를 보면 전반적인 추이를 검토하기 더욱 편할 것이다. 이때 추세선은 전반적이고 유동적인 추이를 시각화하여 제공하고자 함이 주 사용목적이므로 geom_smooth(method = ‘loess’)를 이용하자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A3_1 %&amp;gt;%
+  ggplot(aes(x = 46-president_no, y = value)) +
+  geom_point(size = 2) +
+  geom_line() +
+  geom_smooth() +
+  labs(x=&amp;quot;President of the United States&amp;quot;,
+       y=&amp;quot;Average number of words addressed&amp;quot;) +
+  ylim(c(1000,25000)) +
+  scale_x_continuous(breaks=46-A3_1$president_no,
+                     labels=A3_1$president) +
+  coord_flip() +
+  theme_light()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;인칭대명사-시각화&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;인칭대명사 시각화&lt;/h1&gt;
+&lt;p&gt;이번엔 인칭대명사를 시각화해보자. 먼저 1인칭 복수대명사(‘우리’)의 대통령별 사용빈도를 살펴보자. 전반적인 그래프와 코드는 앞서 평균 단어 수에 사용한 방식과 동일하다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A4_1 = full_join(A3_1, A2_2, by = c(&amp;quot;value&amp;quot; = &amp;quot;...2&amp;quot;))
+A2 = A2 %&amp;gt;% 
+  mutate(A2_num = as.numeric(str_extract(A2$president_no,&amp;quot;[[:digit:]]{1,2}&amp;quot;)))
+
+for (i in 1:43){
+  A4_1[i,10] = sum(A2$...3[A2$A2_num == unique(A4_1$president_no)[i]])
+}
+
+A4_1 = A4_1[,c(1,2,3,10)] %&amp;gt;% rename(&amp;#39;p1_plural&amp;#39;= ...10)
+A4_1 %&amp;gt;%
+  ggplot(aes(x = 46-president_no, y = p1_plural)) +
+  geom_point(size = 2) +
+  geom_line() +
+  geom_smooth() +
+  labs(x=&amp;quot;President of the United States&amp;quot;,
+       y=&amp;quot;Average number of 1P Plural form words addressed&amp;quot;) +
+  ylim(c(0,3500)) +
+  scale_x_continuous(breaks=46-A3_1$president_no,
+                     labels=A3_1$president) +
+  coord_flip() +
+  theme_light()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;우리는 여기서 시대에 따른 ‘우리’ 어휘 사용의 일정한 경향성을 파악할 수 있다. 다른 인칭대명사들의 경우에도 동일할까?&lt;/p&gt;
+&lt;div id=&#34;주관적-해석&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;주관적 해석&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div id=&#34;마무리&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;마무리&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div id=&#34;r-markdown&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;R Markdown&lt;/h2&gt;
+&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34; class=&#34;uri&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When you click the &lt;strong&gt;Knit&lt;/strong&gt; button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(cars)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;including-plots&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Including Plots&lt;/h2&gt;
+&lt;p&gt;You can also embed plots, for example:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2020-06-02-sotu-text-analysis_files/figure-html/pressure-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Note that the &lt;code&gt;echo = FALSE&lt;/code&gt; parameter was added to the code chunk to prevent printing of the R code that generated the plot.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+       <item>
+         <title>Hello R Markdown</title>
+         <link>/2015/07/23/hello-r-markdown/</link>
+         <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+         
+         <guid>/2015/07/23/hello-r-markdown/</guid>
+         <description>
+
+
+&lt;div id=&#34;r-markdown&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;R Markdown&lt;/h1&gt;
+&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34; class=&#34;uri&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You can embed an R code chunk like this:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(cars)
+##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00
+fit &amp;lt;- lm(dist ~ speed, data = cars)
+fit
+## 
+## Call:
+## lm(formula = dist ~ speed, data = cars)
+## 
+## Coefficients:
+## (Intercept)        speed  
+##     -17.579        3.932&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;including-plots&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Including Plots&lt;/h1&gt;
+&lt;p&gt;You can also embed plots. See Figure &lt;a href=&#34;#fig:pie&#34;&gt;1&lt;/a&gt; for example:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(0, 1, 0, 1))
+pie(
+  c(280, 60, 20),
+  c(&amp;#39;Sky&amp;#39;, &amp;#39;Sunny side of pyramid&amp;#39;, &amp;#39;Shady side of pyramid&amp;#39;),
+  col = c(&amp;#39;#0292D8&amp;#39;, &amp;#39;#F7EA39&amp;#39;, &amp;#39;#C4B632&amp;#39;),
+  init.angle = -50, border = NA
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;&lt;span id=&#34;fig:pie&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/2015-07-23-r-rmarkdown_files/figure-html/pie-1.png&#34; alt=&#34;A fancy pie chart.&#34; width=&#34;672&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 1: A fancy pie chart.
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+     </channel>
+   </rss>
