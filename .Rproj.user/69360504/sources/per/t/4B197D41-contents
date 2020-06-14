@@ -1,8 +1,0 @@
-library(blogdown)
-blogdown::new_post()
-build_site()
-serve_site()
-new_post(title = "SOTU text analysis")
-serve_site()
-build_site()
-install.packages("blogdown")

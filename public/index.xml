@@ -11,20 +11,20 @@
     
     
     <item>
-      <title>About Hugo</title>
+      <title>Resume</title>
       <link>/about/</link>
-      <pubDate>Wed, 09 Apr 2014 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 14 May 2014 00:00:00 +0000</pubDate>
       
       <guid>/about/</guid>
-      <description>&lt;p&gt;Hugo is a static site engine written in Go. &lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
-&lt;p&gt;It makes use of a variety of open source projects including:&lt;/p&gt;
+      <description>&lt;h2 id=&#34;소개&#34;&gt;소개&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/spf13/cobra&#34;&gt;Cobra&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/spf13/viper&#34;&gt;Viper&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/spf13/jWalterWeatherman&#34;&gt;J Walter Weatherman&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/spf13/cast&#34;&gt;Cast&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;저는 데이터 저널리스트 및 PD를 꿈꾸는 대학생입니다.&lt;/li&gt;
+&lt;li&gt;저는 사진을 찍고, 영상을 만들고 글을 쓰기를 좋아합니다. 주디스 버틀러와 낸시 프레이저를 비롯한 급진 민주주의 관련 서적을 즐겨 읽습니다.&lt;/li&gt;
+&lt;li&gt;현재 부산에 살고 있습니다. &lt;!-- raw HTML omitted --&gt;&lt;!-- raw HTML omitted --&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Learn more and contribute on &lt;a href=&#34;https://github.com/gohugoio&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;이력서resume&#34;&gt;이력서(Resume)&lt;/h3&gt;
+&lt;p&gt;Why don&amp;rsquo;t you learn more about me on &lt;a href=&#34;https://github.com/joahn-lab/resume&#34;&gt;GitHub&lt;/a&gt;. There is my resume on it. And you can check my &lt;a href=&#34;https://www.instagram.com/babyblu_deepdown&#34;&gt;Instagram&lt;/a&gt;. :)&lt;/p&gt;
+&lt;p&gt;Thank you.&lt;/p&gt;
 </description>
     </item>
     

@@ -1,18 +1,18 @@
 ---
-date: "2014-04-09"
+date: "2014-05-14"
 menu: main
 meta: "false"
-title: About Hugo
+title: Resume
 weight: "20"
 ---
 
-Hugo is a static site engine written in Go. <i class="far fa-clipboard"></i>
+## 소개
 
-It makes use of a variety of open source projects including:
+ * 저는 데이터 저널리스트 및 PD를 꿈꾸는 대학생입니다.
+ * 저는 사진을 찍고, 영상을 만들고 글을 쓰기를 좋아합니다. 주디스 버틀러와 낸시 프레이저를 비롯한 급진 민주주의 관련 서적을 즐겨 읽습니다.
+ * 현재 부산에 살고 있습니다. <i class="far fa-clipboard"></i>
 
-* [Cobra](https://github.com/spf13/cobra)
-* [Viper](https://github.com/spf13/viper)
-* [J Walter Weatherman](https://github.com/spf13/jWalterWeatherman)
-* [Cast](https://github.com/spf13/cast)
+### 이력서(Resume)
+Why don't you learn more about me on [GitHub](https://github.com/joahn-lab/resume). There is my resume on it. And you can check my [Instagram](https://www.instagram.com/babyblu_deepdown). :)
 
-Learn more and contribute on [GitHub](https://github.com/gohugoio).
+Thank you.
