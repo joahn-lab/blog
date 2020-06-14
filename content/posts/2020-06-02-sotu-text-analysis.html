@@ -1,7 +1,7 @@
 ---
 title: "sotu_text_analysis"
 author: "joahn-lab"
-date: '2020-06-02'
+date: '2020-05-01'
 slug: sotu-text-analysis
 output: html_document
 ---
@@ -59,12 +59,13 @@ head(doc_1, n = 10)</code></pre>
 
 wnum = list()
 for (i in 1:max(tmp$doc_id)){
-  doc_n = read_lines(str_c(&quot;C:/Users/Byeongjun Cho/Desktop/2020-1/데이터사이언스입문/data/STU_address/doc_&quot;,as.character(i),&quot;.txt&quot;)) %&gt;% as_tibble %&gt;%
+  doc_n = read_lines(str_c(&quot;doc_&quot;, as.character(i),&quot;.txt&quot;)) %&gt;% as_tibble %&gt;%
     unnest_tokens(words, value, token = &quot;words&quot;)
   wnum = bind_rows(wnum, count(doc_n))
 }
-anyNA(cbind(tmp, wnum))
-A1 = cbind(tmp, wnum) %&gt;% as_tibble
+anyNA(cbind(tmp, wnum))</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>A1 = cbind(tmp, wnum) %&gt;% as_tibble
 
 meanword = list()
 mw = list()
@@ -171,6 +172,17 @@ A2_2 = A2_2[-22,]</code></pre>
 <div id="대통령별-평균-단어-수-시각화" class="section level1">
 <h1>대통령별 평균 단어 수 시각화</h1>
 <p>우선 처음에 구한 대통령별 연설문 평균 단어 수를 시각화해보자.</p>
+<pre class="r"><code>A2_3 = tibble()
+for (i in 0:42){
+  A2_3[i+1,1] = unique(A2_1$president_no)[43-i]
+  A2_3[i+1,2] = unique(A2_1$president)[43-i]}
+for (i in 1:19){
+A2_3[c(i,i+1),2] = A2_3[c(i+1, i),2]}
+A2_3[20,2] = unique(A2_1$president)[22]
+
+A3_1 = bind_cols(A2_3, c)
+A3_1 = A3_1 %&gt;%
+  rename(&quot;president_no&quot; = ...1, &quot;president&quot; = ...2) </code></pre>
 <pre class="r"><code>A3_1 = A3_1 %&gt;% 
   mutate(president_no = str_extract(president_no,&quot;[[:digit:]]{1,2}&quot;),
          president_no = as.numeric(president_no))
@@ -186,7 +198,7 @@ A3_1 %&gt;%
                      labels=A3_1$president) +
   theme(axis.text.x.bottom = element_text(angle = 45)) +
   theme_light()</code></pre>
-<p><img src="/post/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>이때, 대통령별 변화량에 주목하기보다 시대 변화에 따른 추이를 보고 싶다면 축을 세로로 돌리면 좀 더 보기 편할 것이다. ggplot 패키지의 coord_flip() 함수를 이용하면 된다. 추가적으로 추세선과 함께 그래프를 보면 전반적인 추이를 검토하기 더욱 편할 것이다. 이때 추세선은 전반적이고 유동적인 추이를 시각화하여 제공하고자 함이 주 사용목적이므로 geom_smooth(method = ‘loess’)를 이용하자.</p>
 <pre class="r"><code>A3_1 %&gt;%
   ggplot(aes(x = 46-president_no, y = value)) +
@@ -201,7 +213,7 @@ A3_1 %&gt;%
   coord_flip() +
   theme_light()</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="/post/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="인칭대명사-시각화" class="section level1">
 <h1>인칭대명사 시각화</h1>
@@ -228,7 +240,7 @@ A4_1 %&gt;%
   coord_flip() +
   theme_light()</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="/post/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>우리는 여기서 시대에 따른 ‘우리’ 어휘 사용의 일정한 경향성을 파악할 수 있다. 다른 인칭대명사들의 경우에도 동일할까?</p>
 <div id="주관적-해석" class="section level2">
 <h2>주관적 해석</h2>
@@ -252,7 +264,7 @@ A4_1 %&gt;%
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
 <p>You can also embed plots, for example:</p>
-<p><img src="/post/2020-06-02-sotu-text-analysis_files/figure-html/pressure-1.png" width="672" /></p>
+<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/pressure-1.png" width="672" /></p>
 <p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 </div>
 </div>

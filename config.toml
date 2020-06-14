@@ -2,7 +2,7 @@ baseurl = "/"
 title = "Joahn-lab"
 copyright = "Copyright &copy; 2019 - Author Name"
 canonifyurls = true
-theme = "hugo-kiera"
+theme = "indigo"
 
 paginate = 3
 summaryLength = 30
@@ -22,14 +22,6 @@ pygmentsCodeFences = true
     tagline = "A Hugo theme for creative and technical writing"
     
     # options for highlight.js (version, additional languages, and theme)
-    highlightjsVersion = "9.12.0"
-    highlightjsCDN = "//cdnjs.cloudflare.com/ajax/libs"
-    highlightjsLang = ["r", "yaml"]
-    highlightjsTheme = "github"
-
-    MathJaxCDN = "//cdnjs.cloudflare.com/ajax/libs"
-    MathJaxVersion = "2.7.5"
-
     # path to the favicon, under "static"
     favicon = "favicon.ico"
 

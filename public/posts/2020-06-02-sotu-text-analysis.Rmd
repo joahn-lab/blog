@@ -1,14 +1,10 @@
 ---
 title: "sotu_text_analysis"
 author: "joahn-lab"
-date: '2020-06-02'
+date: '2020-05-01'
 slug: sotu-text-analysis
 output: html_document
 ---
-
-```{r global_option, include=FALSE}
-knitr::opts_chunk$set()
-```
 
 ## 도입
 
@@ -34,7 +30,7 @@ head(stu)
 
   이번 텍스트 데이터 전처리는 tidytext 패키지의 unnest_tokens() 함수를 이용한다. 연설문 텍스트 파일을 tibble 형태로 불러온 후, 연결된 문장을 단어별로 구획해보자.
   
-```{r}
+```{r, echo=TRUE}
 doc_1 = read_lines("doc_1.txt") %>% as_tibble() %>% 
   unnest_tokens(words, value, token="words")
 
@@ -45,14 +41,14 @@ head(doc_1, n = 10)
  
   보기와 같이 띄어쓰기를 기준으로 한 어절 단위로 연설문이 처리되었음을 알 수 있다. 이제 우리는 해당 텍스트 데이터의 기본적인 분석에 착수할 수 있다. 우선 연설문당 평균 단어수를 계산해보자.
 
-```{r, results='hide'}
+```{r}
 tmp = stu %>% as_tibble() %>%
   select(president, doc_id, president_no) %>%
   arrange(doc_id)
 
 wnum = list()
 for (i in 1:max(tmp$doc_id)){
-  doc_n = read_lines(str_c("C:/Users/Byeongjun Cho/Desktop/2020-1/데이터사이언스입문/data/STU_address/doc_",as.character(i),".txt")) %>% as_tibble %>%
+  doc_n = read_lines(str_c("doc_", as.character(i),".txt")) %>% as_tibble %>%
     unnest_tokens(words, value, token = "words")
   wnum = bind_rows(wnum, count(doc_n))
 }
@@ -152,7 +148,7 @@ A2_2 %>%
  
  우선 처음에 구한 대통령별 연설문 평균 단어 수를 시각화해보자.
  
-```{r, echo=FALSE}
+```{r}
 A2_3 = tibble()
 for (i in 0:42){
   A2_3[i+1,1] = unique(A2_1$president_no)[43-i]
