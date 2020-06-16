@@ -4,7 +4,7 @@
   
   <url>
     <loc>/posts/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -14,7 +14,12 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/presidential-excitable-speech-analysis_2/</loc>
+    <lastmod>2020-06-13T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -140,6 +145,10 @@
   <url>
     <loc>/posts/migrate-from-jekyll/</loc>
     <lastmod>2014-03-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/posts/2020-06-17-first-product/</loc>
   </url>
   
 </urlset>

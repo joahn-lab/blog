@@ -1,0 +1,199 @@
+---
+title: "Presidential excitable speech analysis (2)"
+author: "joahn"
+date: '2020-06-13'
+slug: presidential-excitable-speech-analysis_2
+output: html_document
+tags: []
+categories: []
+---
+
+
+
+<blockquote>
+<p>본 프로젝트는 2회에 걸쳐 게시되었습니다. 첫 번째 게시물은 자료 수집과 전처리 및 산출식 개발 등에 초점을 맞추고, 두 번째 게시물은 본격적인 상관분석, 시각화와 주관적 분석을 다루고 있습니다.</p>
+</blockquote>
+<hr />
+<p>목차</p>
+<ol style="list-style-type: decimal">
+<li>도입
+<ol style="list-style-type: decimal">
+<li>간단한 소개</li>
+<li>지난 게시물에서는</li>
+</ol></li>
+<li>상관분석 및 시각화
+<ol style="list-style-type: decimal">
+<li>상관분석</li>
+<li>시각화
+<ol style="list-style-type: decimal">
+<li>단어별 시각화</li>
+<li>부정/긍정평가 시각화</li>
+<li>급진/중도평가 시각화</li>
+<li>상관관계 추이 시각화</li>
+<li>대시보드화</li>
+</ol></li>
+</ol></li>
+<li>주관적 분석</li>
+</ol>
+<div id="간단한-소개" class="section level2">
+<h2>간단한 소개</h2>
+<p><strong> 2018.2 ~ 문재인 현 대통령의 국정 지지도</strong>와 네이버/다음 메인 시사 뉴스 댓글 중 <strong>‘문재앙’ 키워드를 포함한 댓글의 좋아요/싫어요 수치</strong>를 구한다. 이를 상관 분석을 통해 비교하고자 한다.</p>
+</div>
+<div id="지난-게시물에서는" class="section level2">
+<h2>지난 게시물에서는</h2>
+<p>지난번 게시물에서는 N2H4와 xml2, rvest 등의 패키지를 이용하여 네이버 랭킹 배너 조회수 기준 top 30개 기사에 달린 댓글 수와 좋아요/싫어요 갯수를 크롤링하고, 크롤링한 댓글 관련 데이터와 여론조사 기관의 국정 지지도 데이터를 상관분석할 수 있도록 전처리하는 작업을 서술했다. 이번에는 전처리하고 scatterplot으로 살펴본 데이터를 상관분석하고 시각화하여 이를 바탕으로 나름의 주관적 분석을 해볼까한다.</p>
+<p>분석에 활용할 댓글 크롤링 데이터는 다음과 같다. 비하 단어 5개(순서대로 ‘문재앙’, ‘문죄인’, ‘중국몽’, ‘문슬람’, ‘대깨문’)의 댓글 수(num_), 좋아요 수(like_), 싫어요 수(dislike_)가 순서대로 수집된 된 것을 확인할 수 있다.</p>
+<pre class="r"><code>Summary</code></pre>
+<pre><code>## # A tibble: 120 x 19
+##    like_all dislike_all num_all like_1 dislike_1 num_1 like_2 dislike_2 num_2
+##       &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+##  1  3205941      907208  150062  88552     41136  3065  33273      9399   803
+##  2  7317042     1745848  318100 156497     66183  7673  25083     10517  1675
+##  3  6700141     1290108  292988 179743     48236  6897  42685     10651  1683
+##  4  8016580     1985358  346844  88526     36852  6563  20147      9517  1732
+##  5  6937595     1204274  335147  42375     16495  3886  11595      4082  1027
+##  6  5430342     1108540  279648  41482     22111  3455   7675      3718   868
+##  7  4309517      885848  244927  27128     11087  3089   8296      3695   908
+##  8  5387709     1069080  274960  67028     22238  4785  13658      4743  1209
+##  9  4920489     1035519  267698  34338     16508  3727  11035      5376  1120
+## 10  7245289      955180  361099  34102     16273  4069  14388      4761  1083
+## # ... with 110 more rows, and 10 more variables: like_3 &lt;dbl&gt;, dislike_3 &lt;dbl&gt;,
+## #   num_3 &lt;dbl&gt;, like_4 &lt;dbl&gt;, dislike_4 &lt;dbl&gt;, num_4 &lt;dbl&gt;, like_5 &lt;dbl&gt;,
+## #   dislike_5 &lt;dbl&gt;, num_5 &lt;dbl&gt;, week &lt;dttm&gt;</code></pre>
+<p>그리고 지난 게시물 마지막에 보았던 scatterplot을 다시 보는 것으로 시작하자.</p>
+<div id="option-2는-좋아요-수-좋아요-싫어요-수" class="section level5">
+<h5>Option 2는 좋아요 수 / (좋아요 + 싫어요 수)</h5>
+</div>
+<div id="option-3는-좋아요-싫어요-수-좋아요-수log단어-포함-댓글-수전체-댓글-수" class="section level5">
+<h5>Option 3는 {(좋아요 + 싫어요 수) / 좋아요 수}*log(단어 포함 댓글 수/전체 댓글 수)</h5>
+<pre class="r"><code>## Option 2
+par(mfrow = c(2, 2))
+plot(Summary.df$disaster, Summary.df.2$잘못한다, main = &quot;문재앙 지수&quot;)
+plot(Summary.df$sinner, Summary.df.2$잘못한다, main = &quot;문죄인 지수&quot;)
+plot(Summary.df$islam, Summary.df.2$잘못한다, main = &quot;문슬람 지수&quot;)
+plot(Summary.df$head, Summary.df.2$잘못한다, main = &quot;대깨문 지수&quot;)</code></pre>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>## Option 3
+par(mfrow = c(2, 2))
+plot(Summary.df.2$disaster, Summary.df.2$잘못한다, main = &quot;문재앙 지수&quot;)
+plot(Summary.df.2$sinner, Summary.df.2$잘못한다, main = &quot;문죄인 지수&quot;)
+plot(Summary.df.2$islam, Summary.df.2$잘못한다, main = &quot;문슬람 지수&quot;)
+plot(Summary.df.2$head, Summary.df.2$잘못한다, main = &quot;대깨문 지수&quot;)</code></pre>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>어떤 지수를 사용할지는 우리 마음이지만, 두 개의 지수에 따른 데이터 분포는 약간 다른 형태를 보여준다. 추후 시각화된 그래프를 살펴보면 어떤 특성에 따라 다르게 나타나는지 확인할 수 있으며 이는 개별 비하 단어 사용의 특성(맥락, 어감, 비하 대상) 등의 차이를 암시한다.</p>
+</div>
+</div>
+<div id="상관분석" class="section level2">
+<h2>상관분석</h2>
+<p>그렇다면 5개 단어와 여론조사 평가항목(한국갤럽 및 리얼미터) 11개 및 정치성향별(보수/진보/중도) 평가항목 21개를 합한 총 32개의 평가항목 간의 피어슨 상관계수는 어떻게 나타났을까?</p>
+<pre class="r"><code># option 2
+mySumm %&gt;% arrange(p.value) %&gt;%
+  select(word, eval, estimate, everything(), -method) %&gt;%
+  filter(p.value&lt;.05) %&gt;% print(n = 30)</code></pre>
+<pre><code>## # A tibble: 108 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1 disa~ 잘한다~   -0.668     -9.59 2.54e-16       114   -0.758    -0.553
+##  2 disa~ 잘못한다~    0.665      9.50 4.02e-16       114    0.549     0.756
+##  3 disa~ 중도잘한~   -0.669     -9.53 4.03e-16       112   -0.760    -0.553
+##  4 disa~ 매우잘한~   -0.664     -9.48 4.48e-16       114   -0.755    -0.548
+##  5 disa~ 중도잘못~    0.667      9.48 5.20e-16       112    0.551     0.758
+##  6 disa~ 보수매우~    0.660      9.30 1.34e-15       112    0.542     0.753
+##  7 disa~ 보수잘못~    0.659      9.27 1.61e-15       112    0.540     0.752
+##  8 disa~ 중도매우~   -0.658     -9.24 1.87e-15       112   -0.751    -0.539
+##  9 disa~ 보수매우~   -0.653     -9.13 3.32e-15       112   -0.747    -0.533
+## 10 disa~ g잘하고~   -0.661     -9.12 5.07e-15       107   -0.755    -0.540
+## 11 disa~ g잘못하~    0.661      9.11 5.21e-15       107    0.540     0.755
+## 12 disa~ 매우잘못~    0.645      9.00 5.84e-15       114    0.524     0.740
+## 13 disa~ 보수잘한~   -0.648     -9.01 6.34e-15       112   -0.744    -0.527
+## 14 disa~ 중도매우~    0.634      8.67 3.82e-14       112    0.509     0.732
+## 15 disa~ 진보잘못~    0.627      8.53 8.11e-14       112    0.501     0.727
+## 16 sinn~ 매우잘한~   -0.618     -8.40 1.39e-13       114   -0.720    -0.492
+## 17 disa~ 진보잘한~   -0.620     -8.36 1.90e-13       112   -0.722    -0.492
+## 18 sinn~ 중도매우~   -0.615     -8.25 3.51e-13       112   -0.717    -0.486
+## 19 sinn~ 진보잘못~    0.610      8.15 5.77e-13       112    0.480     0.714
+## 20 sinn~ 잘한다~   -0.604     -8.10 6.73e-13       114   -0.709    -0.474
+## 21 disa~ 보수모름~   -0.603     -8.00 1.27e-12       112   -0.708    -0.471
+## 22 sinn~ 잘못한다~    0.595      7.90 1.93e-12       114    0.463     0.701
+## 23 sinn~ 진보잘한~   -0.597     -7.88 2.30e-12       112   -0.704    -0.464
+## 24 disa~ 진보매우~   -0.595     -7.84 2.84e-12       112   -0.702    -0.462
+## 25 disa~ 진보매우~    0.595      7.83 3.01e-12       112    0.461     0.702
+## 26 sinn~ 중도잘한~   -0.593     -7.79 3.68e-12       112   -0.700    -0.459
+## 27 sinn~ 중도잘못~    0.588      7.69 6.27e-12       112    0.453     0.696
+## 28 sinn~ 진보매우~   -0.580     -7.54 1.30e-11       112   -0.691    -0.444
+## 29 sinn~ 보수잘못~    0.579      7.52 1.47e-11       112    0.442     0.690
+## 30 sinn~ 보수잘한~   -0.579     -7.52 1.49e-11       112   -0.690    -0.442
+## # ... with 78 more rows, and 1 more variable: alternative &lt;chr&gt;</code></pre>
+<pre class="r"><code># option 3
+mySumm.2 %&gt;% arrange(p.value) %&gt;%
+  select(word, eval, estimate, everything(), -method) %&gt;%
+  filter(p.value&lt;.05) %&gt;% print(n = 30)</code></pre>
+<pre><code>## # A tibble: 121 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1 head  중도잘못~    0.779     13.1  2.05e-24       112    0.694     0.842
+##  2 head  중도잘한~   -0.772    -12.9  8.41e-24       112   -0.837    -0.686
+##  3 head  중도매우~    0.765     12.6  3.95e-23       112    0.676     0.832
+##  4 head  보수잘못~    0.762     12.5  6.59e-23       112    0.673     0.830
+##  5 head  보수매우~    0.761     12.4  8.01e-23       112    0.672     0.829
+##  6 head  매우잘못~    0.757     12.4  8.99e-23       114    0.666     0.825
+##  7 head  잘못한다~    0.756     12.3  9.72e-23       114    0.666     0.825
+##  8 head  보수잘한~   -0.752    -12.1  5.60e-22       112   -0.822    -0.659
+##  9 head  잘한다~   -0.737    -11.6  3.91e-21       114   -0.811    -0.641
+## 10 head  중도매우~   -0.722    -11.0  1.33e-19       112   -0.799    -0.620
+## 11 head  g잘못하~    0.731     11.1  1.73e-19       107    0.630     0.808
+## 12 head  보수잘하~   -0.713    -10.8  5.34e-19       112   -0.793    -0.609
+## 13 head  보수매우~   -0.706    -10.5  1.80e-18       112   -0.788    -0.600
+## 14 head  g잘하고~   -0.716    -10.6  2.02e-18       107   -0.797    -0.610
+## 15 head  진보매우~    0.691     10.1  1.84e-17       112    0.581     0.776
+## 16 head  보수모름~   -0.688    -10.0  2.57e-17       112   -0.774    -0.578
+## 17 disa~ 진보매우~   -0.682     -9.88 6.38e-17       112   -0.770    -0.570
+## 18 head  매우잘한~   -0.674     -9.75 1.06e-16       114   -0.763    -0.561
+## 19 disa~ 매우잘한~   -0.669     -9.60 2.38e-16       114   -0.758    -0.554
+## 20 disa~ 중도매우~   -0.635     -8.70 3.26e-14       112   -0.733    -0.511
+## 21 head  진보잘못~    0.633      8.65 4.18e-14       112    0.508     0.732
+## 22 sinn~ 매우잘한~   -0.627     -8.60 5.01e-14       114   -0.726    -0.502
+## 23 disa~ 진보잘하~    0.631      8.62 5.05e-14       112    0.506     0.730
+## 24 sinn~ 진보잘못~    0.629      8.55 7.08e-14       112    0.503     0.728
+## 25 disa~ 진보잘못~    0.628      8.53 7.75e-14       112    0.502     0.728
+## 26 disa~ 진보잘한~   -0.625     -8.47 1.07e-13       112   -0.725    -0.498
+## 27 sinn~ 진보잘한~   -0.625     -8.46 1.13e-13       112   -0.725    -0.498
+## 28 sinn~ 진보매우~   -0.624     -8.46 1.17e-13       112   -0.725    -0.497
+## 29 disa~ 진보잘못~    0.614      8.23 3.81e-13       112    0.485     0.717
+## 30 disa~ 보수매우~   -0.611     -8.17 5.11e-13       112   -0.715    -0.481
+## # ... with 91 more rows, and 1 more variable: alternative &lt;chr&gt;</code></pre>
+<p>상관계수가 높은 상위 30개 항목을 보았을 때 상관도가 높은 단어가 지수별로 상이하게 나옴을 알 수 있다. 가령 댓글 좋아요와 싫어요를 단순 비교한 Option 2의 경우 ‘문재앙’ 댓글이 높은 상관도를 보이는 반면, 전체 댓글 수 대비 비하 단어 포함 댓글 수를 로그 변환 후 반영하는 Option 3의 경우 ‘대깨문’ 댓글이 높은 상관도를 보이고 있다.</p>
+<p>이제 ggplot2 패키지를 통해 2개 지수의 상관계수를 단어별로 시각화하여 살펴보도록 하자.</p>
+<div id="단어별-시각화" class="section level3">
+<h3>단어별 시각화</h3>
+<div id="option-2" class="section level5">
+<h5>Option 2</h5>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/cars-1.png" width="672" /></p>
+</div>
+<div id="option-3" class="section level5">
+<h5>Option 3</h5>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+<div id="부정긍정평가-시각화" class="section level3">
+<h3>부정/긍정평가 시각화</h3>
+</div>
+<div id="급진중도평가-시각화" class="section level3">
+<h3>급진/중도평가 시각화</h3>
+</div>
+<div id="상관관계-추이-시각화" class="section level3">
+<h3>상관관계 추이 시각화</h3>
+</div>
+<div id="샤이니-대시보드화" class="section level3">
+<h3>샤이니 대시보드화</h3>
+</div>
+<div id="주관적-분석" class="section level3">
+<h3>주관적 분석</h3>
+<style>
+body {
+  font-family: NanumGothic;
+  fontsize = 8px
+}
+</style>
+</div>
+</div>

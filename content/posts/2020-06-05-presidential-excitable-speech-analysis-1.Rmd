@@ -495,7 +495,7 @@ Summary.df.2 = Summary.df %>%
          head = {(like_5+dislike_5)/(like_5)}*log(num_5/num_all)) %>%
   select(disaster, sinner, china, islam, head, everything())
 
-Summary.df.2 = bind_cols(Summary.df.2, ideo) %>% select(-week)
+# Summary.df.2 = bind_cols(Summary.df.2, ideo) %>% select(-week)
 
 mySumm.2 = tibble()
 for (i in colnames(Summary.df.2[1:5])){

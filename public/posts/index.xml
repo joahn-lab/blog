@@ -6,10 +6,20 @@
     <description>Recent content in Posts on Joahn-lab</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright &amp;copy; 2019 - Author Name</copyright>
-    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Presidential excitable speech analysis (2)</title>
+      <link>/posts/presidential-excitable-speech-analysis_2/</link>
+      <pubDate>Sat, 13 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/presidential-excitable-speech-analysis_2/</guid>
+      <description>본 프로젝트는 2회에 걸쳐 게시되었습니다. 첫 번째 게시물은 자료 수집과 전처리 및 산출식 개발 등에 초점을 맞추고, 두 번째 게시물은 본격적인 상관분석, 시각화와 주관적 분석을 다루고 있습니다.
+목차</description>
+    </item>
     
     <item>
       <title>Presidential excitable speech analysis (1)</title>
@@ -83,6 +93,15 @@ Save it somewhere specific as we will be using it in the next step.</description
       
       <guid>/posts/migrate-from-jekyll/</guid>
       <description>Move static content to static Jekyll has a rule that any directory not starting with _ will be copied as-is to the _site output. Hugo keeps all static content under static.</description>
+    </item>
+    
+    <item>
+      <title>Prototype</title>
+      <link>/posts/2020-06-17-first-product/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/2020-06-17-first-product/</guid>
+      <description>## OGR data source with driver: ESRI Shapefile ## Source: &amp;quot;C:\Users\Byeongjun Cho\Documents\blog\blog\content\posts&amp;quot;, layer: &amp;quot;EMD_1&amp;quot;## with 5047 features## It has 6 fields</description>
     </item>
     
   </channel>
