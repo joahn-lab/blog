@@ -1,5 +1,5 @@
 ---
-title: "sotu_text_analysis"
+title: "SOTU Text Analysis"
 author: "joahn-lab"
 date: '2020-05-01'
 slug: sotu-text-analysis
@@ -197,9 +197,14 @@ A3_1 %>%
   theme_light()
 ```
 
+당시 미국의 역사적 흐름과 결부해 위와 같이 평균 단어 수가 변화하는 추세를 분석해보면 다음과 같다.
+개국부터 남북전쟁, 독립전쟁 및 노예제 폐지를 지나 20세기 초반의 경제 호황기에 접어들기까지 미국은 정치 부문의 민주적 발전과 경제 부문의 양적 팽창을 도모해 왔다. 이에 따라 대통령은 자신의 국정 연설에 국가가 나아갈 방향에 대한 제언 등 여러 강조 사항을 담고자 했을 것이다. 그런데, 27대 대통령 윌리엄 태프트 재임 기간에서 28대 대통령 우드로 윌슨 재임 기간으로 넘어가는 지점에서는 평균 단어 수의 추이가 급감하는데, 그 이유는 앞서 언급한 역사적 맥락과 비교해 훨씬 명확하다. USCB(Univ. Santa Barbara)의 한 에세이에 따르면, 3대 대통령 토머스 제퍼슨부터 28대 대통령 우드로 윌슨 대통령 직전까지 이어져 온 서면(written) 연설 방식이 구두(oral) 연설 방식으로 바뀐 것이다. 구두로 연설하는 탓에 연설문당 단어 수가 기존과 같이 2만 개를 넘기기는 어려웠을 것이며, 따라서 연설문 분량은 발언하기 적당한 정도로 조정되어야 했을 것이다. 
+또한, 33대 대통령 해리 트루먼 이래로는 연설이 TV로 방송되기 시작해 훨씬 다양한 계층에 분포한 대중들도 연설을 접할 수 있게 되었다. 따라서 문장은 이전보다 쉽고 간결해져야 했을 것이며 연설 분량은 평균화되어, 이에 평균 단어 수는 일정량에 수렴하게 되었을 것이다.
+
+
 # 인칭대명사 시각화
 
- 이번엔 인칭대명사를 시각화해보자. 먼저 1인칭 복수대명사('우리')의 대통령별 사용빈도를 살펴보자. 전반적인 그래프와 코드는 앞서 평균 단어 수에 사용한 방식과 동일하다.
+ 이번엔 인칭대명사를 시각화해보자. 그 중에서 분석하기 용이하다고 판단되는 1인칭 복수대명사('우리')의 대통령별 사용빈도를 살펴보자. 전반적인 그래프와 코드는 앞서 평균 단어 수에 사용한 방식과 동일하다.
  
 ```{r}
 A4_1 = full_join(A3_1, A2_2, by = c("value" = "...2"))
@@ -225,31 +230,10 @@ A4_1 %>%
   theme_light()
 ```
 
-우리는 여기서 시대에 따른 '우리' 어휘 사용의 일정한 경향성을 파악할 수 있다. 다른 인칭대명사들의 경우에도 동일할까?
+우리는 여기서 시대에 따른 '우리' 어휘 사용의 일정한 경향성을 파악할 수 있다.
 
-
-```{r}
-```
 ## 주관적 해석
 
-## 마무리
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+왜 '우리'를 많이 썼을까? UC Santa Barbara Presidency project 웹사이트의 설명을 참조하여 나름대로 분석해 보면 다음과 같다.
+연설이 방송되기 시작한 33대 대통령 해리 트루먼 재임 기간 즈음에서부터 연설문당 ‘우리’를 1500단어 이상, 즉 이전과 달리 아주 빈번하게 사용하는 대통령들이 등장하고 있다. ‘우리’라는 대명사에는 화자인 대통령과 예상 청자가 한데 묶여 있는데, 여기서 예상 청자는 TV를 통해 대통령의 국정 연설을 접하게 된 아주 다양한 계층의 시민들일 것이다. 더군다나 20세기 초중반에 이르러 미국의 여성, 원주민, 유색인종 등은 일정한 나이가 되면 자연히 투표권을 부여받는 ‘실질적’ 보통선거권을 누리게 되었다. 따라서 대통령은 국가 권력 행사의 정당성이 비롯되는 시민들의 정치 참여, 즉 다양한 사회 계층으로 이뤄진 대중들의 정치적 영향력을 의식할 수밖에 없었을 것이다. 
+이러한 사회적 맥락 속에서 대통령들은 ‘우리’라는 대명사를 빈번히 사용하여 예상 청자인 시민들과의 친밀감 혹은 시민들의 정치적 소속감을 유도하고, 궁극적으로 자신들의 권력 행사에 대한 정당성을 안전하게 보장받고자 했을 것이다.

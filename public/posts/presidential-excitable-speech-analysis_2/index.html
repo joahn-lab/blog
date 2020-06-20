@@ -52,7 +52,7 @@
             </div>
         
             <div class="page-nav-item">
-                <a href="/about/">
+                <a href="/resume/">
                     
                     <span>Resume</span>
                 </a>
@@ -270,22 +270,110 @@ mySumm.2 %&gt;% arrange(p.value) %&gt;%
 <div id="option-3" class="section level5">
 <h5>Option 3</h5>
 <p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Option 2에서는 ‘중국몽’, Option 3에서는 ’문슬람’과 댓글 지수가 거의 무관한 것으로 추정된다. 따라서 각 수식의 이후 시각화에서 해당 단어는 제외했다.</p>
 </div>
 </div>
 <div id="부정긍정평가-시각화" class="section level3">
 <h3>부정/긍정평가 시각화</h3>
+<p>국정수행 부정평가와 긍정평가 두 수치와 Option 2,3 식의 상관관계를 시각화해보자. 여론조사 항목에서 ’잘못’이 들어가면 부정평가 항목이며 긍정평가 항목은 |을 이용하여 일일이 필터링 전처리를 해준다.
+비하 단어와 여론조사의 상관도를 살펴보고 있는만큼 상식적으로라면 부정평가와 더 많은 호응을 할 것이다. 즉, 시민들은 대통령에 대한 부정적 평가와 비하 단어 사이에서 더 긴밀한 연관을 보이고 있을 것이다. 그런데 과연 그럴까?</p>
+<div id="option-2-1" class="section level5">
+<h5>Option 2</h5>
+<pre class="r"><code>mySumm %&gt;%
+  filter(str_detect(eval, &quot;잘못&quot;)) %&gt;%
+  mutate(colors = ifelse(p.value&lt;0.05, &#39;valid&#39;, &#39;invalid&#39;)) %&gt;%
+  filter(!str_detect(word, &quot;china&quot;)) %&gt;%
+  filter(!str_detect(eval, &quot;보수&quot;) &amp; !str_detect(eval, &quot;진보&quot;) &amp; !str_detect(eval, &quot;중도&quot;)) %&gt;%
+  ggplot(aes(x = word, y = estimate, fill = colors)) +
+  ggtitle(&quot;비하 단어별 부정평가 상관계수(A)&quot;)+
+  geom_bar(stat = &quot;identity&quot;) +
+  geom_text(aes(label=round(estimate,4), vjust=-0.2), size = 3.5) +
+  xlab(&quot;비하 단어&quot;)+
+  ylab(&quot;상관계수&quot;)+
+  scale_x_discrete(labels = c(&quot;문재앙&quot;, &quot;대깨문&quot;, &quot;문슬람&quot;, &quot;문죄인&quot;))+
+  scale_fill_discrete(name = &quot;p값(&lt;.05) 기준 유의도&quot;, labels = c(&quot;유의하지 않다&quot;,&quot;유의하다&quot;))+
+  theme_bw()+
+  facet_wrap(~eval)</code></pre>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="option-3-1" class="section level5">
+<h5>Option 3</h5>
+<pre class="r"><code>mySumm.2 %&gt;%
+  filter(str_detect(eval, &quot;잘못&quot;)) %&gt;%
+  filter(!str_detect(word, &quot;islam&quot;)) %&gt;%
+  mutate(colors = ifelse(p.value&lt;0.05, &#39;valid&#39;, &#39;invalid&#39;)) %&gt;%
+  filter(!str_detect(eval, &quot;보수&quot;) &amp; !str_detect(eval, &quot;진보&quot;) &amp; !str_detect(eval, &quot;중도&quot;)) %&gt;%
+  ggplot(aes(x = word, y = estimate, fill = colors)) +
+  ggtitle(&quot;비하 단어별 부정평가 상관계수(B)&quot;)+
+  geom_bar(stat = &quot;identity&quot;) +
+  geom_text(aes(label=round(estimate,4), vjust=-0.2), size = 3.5) +
+  xlab(&quot;비하 단어&quot;)+
+  ylab(&quot;상관계수&quot;)+
+  scale_x_discrete(labels = c(&quot;중국몽&quot;, &quot;문재앙&quot;, &quot;대깨문&quot;, &quot;문죄인&quot;))+
+  scale_fill_brewer(name = &quot;p값(&lt;.05) 기준 유의도&quot;, labels = c(&quot;유의하다&quot;), palette = &quot;Set2&quot;)+
+  theme_bw()+
+  facet_wrap(~eval)</code></pre>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+<img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>상식에 기반한 추측과는 달리, 긍정평가 부정평가 모두 비슷한 상관계수를 보이고 있다. 댓글 좋아요 비율만을 반영하는 Option 2는 주로 ‘문재앙’, ‘문죄인’ 포함 댓글과, 로그값으로 변환된 작성 댓글 수를 반영한 Option 3의 경우 ‘대깨문’ 포함 댓글이 높은 상관도를 보이고 있다. 또한 긍/부정평가 모두 ‘잘하는 편’, ‘잘못하는 편’ 등 중도평가에서 다소 애매한 수치를 보이고 있는 점 역시 흥미롭다. 중도평가를 내리는 이들은 비하 단어 포함 댓글에 상대적으로 덜 호응하고 있다고 볼 수 있는 것이다.</p>
+<p>급진/중도평가를 나누어 시각화하여 이 부분을 좀 더 자세히 들여다보자. 어떤 현상을 포착할 수 있을까? 그리고 이번에는 세부 정치성향별 여론조사 항목도 함께 넣어보자. 보수 성향 응답자와 진보 성향 응답자 사이에는 어떻게 눈에 띄는 차이가 발견될까?</p>
+</div>
 </div>
 <div id="급진중도평가-시각화" class="section level3">
 <h3>급진/중도평가 시각화</h3>
+<div id="option-2-2" class="section level5">
+<h5>Option 2</h5>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-11-1.png" width="672" /><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+</div>
+<div id="option-3-2" class="section level5">
+<h5>option 3</h5>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-12-1.png" width="672" /><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+<p>우선 급진평가에서는 Option 2와 Option 3에서 모두 뚜렷하고 일관된 결과를 보이고 있다. 즉 여론조사 항목과 직접 계산한 비하 댓글 지수가 나름대로 적절히 호응하고 있으며 이는 대통령 국정수행에 대해 다소 급진적인 의견을 가진 이들이 비하 댓글이라는 proxy를 통해 적절히 대표되고 있음으로 해석할 수 있을 것이다. 그런데 중도평가 항목에서는 그렇지 않다. 눈에 띄는 현상으로는, 보수 성향 응답자와 진보 성향 응답자의 치우침이 있다.</p>
+<p>마지막으로, 상관관계 추이를 살펴보자. 조사기간이 120주였던 만큼, 이를 4부분으로 나누어도 상관도를 파악하기 적절한 표본 수를 보장받을 수 있을 거라고 판단했다. 우선 앞 2부분, 즉 2018.2~2019.4는 대통령 지지도가 꾸준히 하락한 시점이며 뒷 2부분 2019.4~2020.5는 레임덕 현상으로 지지율이 지지부진하며 코로나 사태로 국정 변동이 심하던 시점과 맞물린다. 따라서 시간이 지날수록 비하 단어와 국정평가의 상관도는 상대적으로 감소해왔을 것이라고 상식적인 추측을 해 볼 수 있다.</p>
+<p>과연 그럴까?</p>
+</div>
 </div>
 <div id="상관관계-추이-시각화" class="section level3">
 <h3>상관관계 추이 시각화</h3>
-</div>
-<div id="샤이니-대시보드화" class="section level3">
-<h3>샤이니 대시보드화</h3>
+<p>상관관계 추이를 살펴보기 위해 다음과 같은 for문 코드를 작성한다. 120주를 4번의 구간으로 분할한 후 각 구간별로 여론조사 항목과 비하 단어 지수의 상관도 테스트를 거칠 것이다.</p>
+<pre class="r"><code>myChange = tibble()
+for (k in 1:4){
+  for (i in colnames(Summary.df[1:5])){
+    for (j in colnames(Summary.df[24:34])){
+      formula = as.formula(str_c(&quot;~&quot;,i,&quot;[&quot;,as.character(1+(k-1)*30),&quot;:&quot;,as.character(30*k),&quot;]+&quot;,j,&quot;[&quot;,as.character(1+(k-1)*30),&quot;:&quot;,as.character(30*k),&quot;]&quot;))
+      myCorr = cor.test(formula, data = Summary.df) %&gt;% tidy() %&gt;% 
+        select(estimate, p.value, conf.low, conf.high)
+      myCorr$word = i
+      myCorr$eval = j
+      myCorr$session = k
+      myChange = bind_rows(myCorr, myChange)
+  }
+}
+}</code></pre>
+<p>이하 그래프 별로 코드가 거의 비슷하므로 ggplot 코드 하나만을 보자면 다음과 같다.</p>
+<pre class="r"><code>myChange %&gt;%
+  filter(eval == &quot;잘한다&quot; | eval == &quot;잘하는편&quot; | eval == &quot;매우잘한다&quot; | eval == &quot;g잘하고있다&quot;) %&gt;%
+  mutate(colors = ifelse(p.value&lt;0.05, &#39;valid&#39;, &#39;invalid&#39;)) %&gt;%
+  ggplot(aes(x = session, y = estimate)) +
+  ggtitle(&quot;조사기간별 상관계수 추이(A)&quot;)+
+  geom_bar(aes(fill = word), stat= &quot;identity&quot;, position = &quot;dodge&quot;) +
+  xlab(&quot;조사기간\n(4분할)&quot;)+
+  ylab(&quot;상관계수&quot;)+
+  scale_x_continuous(breaks = c(1,2,3,4), labels = c(&quot;&#39;18.02~\n&#39;18.08&quot;,&quot;&#39;18.09~\n&#39;19.03&quot;,&quot;&#39;19.04~\n&#39;19.10&quot;,&quot;&#39;19.11~\n&#39;20.05&quot;))+
+  scale_fill_discrete(name = &quot;word&quot;, labels = c(&quot;중국몽&quot;, &quot;문재앙&quot;, &quot;대깨문&quot;, &quot;문슬람&quot;, &quot;문죄인&quot;))+
+  theme(axis.text = element_text(size = 8))+
+  theme_bw()+
+  facet_wrap(~eval)</code></pre>
+<p><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+<img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-15-1.png" width="672" /><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-15-2.png" width="672" /><img src="/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
+<p>Option 2와 3에서 조금씩, 그리고 비하 단어별로 다소 난잡한 차이는 보이지만, 대체로 구간이 지날수록 상관도가 조금씩 줄어들며, 특히 중도 평가 항목(“잘하는편”, “잘못하는편”)에서는 상관도가 거의 없다고 볼 수도 있겠다. <strong>즉 레임덕 기간에 대통령에 대해 중도평가를 내리는 이들은 대체로 대통령에 대해 큰 기대나 실망이 없기에 비하 단어에 굳이 반응하지 않고 있는 것으로 볼 수 있겠다.</strong></p>
 </div>
 <div id="주관적-분석" class="section level3">
 <h3>주관적 분석</h3>
+<p>이번 상관도 분석에서 개인적으로 가장 흥미로웠고 확실히 말할 수 있는 지점은, ‘중국몽’과 ’문슬람’과 같이 특정 국가나 종교를 비하하는 맥락을 함유한 단어의 사용이나 여론과의 호응이 저조했다는 점이다. 대통령에게 책임을 귀인하는 듯한 ’문재앙’ ‘문죄인’ 등의 비하 단어나 심지어 대통령 지지 집단 비하 단어인 ‘대깨문’ 보다 여론과의 호응(상관도)가 낮았다는 사실에서 우리는 이러한 단어의 사용이 특히 정치적인 레토릭으로 다분히 활용되고 있다는 인상을 받는다.</p>
+<p>물론 해석은 모두 다를 것이다.</p>
+<p><mark>끝</mark></p>
 <style>
 body {
   font-family: NanumGothic;
@@ -309,7 +397,7 @@ body {
       <nav id="article-skip">
         <div class="next">
           
-          <a alt="Newer article" href="/about/">&larr; Newer</a>
+          <a alt="Newer article" href="/resume/">&larr; Newer</a>
           
         </div>
         <div class="top">

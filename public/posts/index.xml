@@ -32,7 +32,7 @@
     </item>
     
     <item>
-      <title>sotu_text_analysis</title>
+      <title>SOTU Text Analysis</title>
       <link>/posts/sotu-text-analysis/</link>
       <pubDate>Fri, 01 May 2020 00:00:00 +0000</pubDate>
       
@@ -101,7 +101,16 @@ Save it somewhere specific as we will be using it in the next step.</description
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/posts/2020-06-17-first-product/</guid>
-      <description>## OGR data source with driver: ESRI Shapefile ## Source: &amp;quot;C:\Users\Byeongjun Cho\Documents\blog\blog\content\posts&amp;quot;, layer: &amp;quot;EMD_1&amp;quot;## with 5047 features## It has 6 fields</description>
+      <description>## OGR data source with driver: ESRI Shapefile ## Source: &amp;quot;C:\Users\Byeongjun Cho\Documents\blog\blog\content\posts&amp;quot;, layer: &amp;quot;CTPRVN_1&amp;quot;## with 17 features## It has 6 fields</description>
+    </item>
+    
+    <item>
+      <title>공간 데이터 다루기</title>
+      <link>/posts/2020-06-19-spatial-data/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/2020-06-19-spatial-data/</guid>
+      <description>도입이번 ‘데이터 사이언스 입문’ 수업의 팀 프로젝트에서는 ’응급의료취약지 분석/도출 및 시각화’라는 주제로 공공 api가 제공하는 텍스트 데이터와 행정구역도 공간 데이터를 주로 활용했다.</description>
     </item>
     
   </channel>

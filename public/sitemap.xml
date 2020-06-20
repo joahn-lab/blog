@@ -8,8 +8,8 @@
   </url>
   
   <url>
-    <loc>/about/</loc>
-    <lastmod>2014-05-14T00:00:00+00:00</lastmod>
+    <loc>/resume/</loc>
+    <lastmod>2020-05-14T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -149,6 +149,10 @@
   
   <url>
     <loc>/posts/2020-06-17-first-product/</loc>
+  </url>
+  
+  <url>
+    <loc>/posts/2020-06-19-spatial-data/</loc>
   </url>
   
 </urlset>
