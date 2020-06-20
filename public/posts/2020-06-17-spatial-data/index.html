@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    
+    <title>공간 데이터 다루기 | Joahn-lab</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href=/apple-touch-icon.png>
+    <link rel="icon" type="image/png" sizes="32x32" href=/favicon-32x32.png>
+    <link rel="icon" type="image/png" sizes="16x16" href=/favicon-16x16.png>
+    <link rel="manifest" href=/site.webmanifest>
+    <link rel="mask-icon" href=/safari-pinned-tab.svg color="#00416a">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    
+    
+    
+    
+    
+    
+    <link rel="authorization_endpoint" href=https://indieauth.com/auth />
+    <link rel="token_endpoint" href=https://tokens.indieauth.com/token />
+    
+    
+    
+    
+    <link rel="stylesheet" href=/css/fonts.css />
+    <link rel="stylesheet" href=/css/style.css />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div id="sitelogo">
+        <a class="glyph" alt="Home" href="/"><img src=/images/site-logo.svg alt="Site Logo" height="64px" width="64px"></a>
+    </div>
+    <header>
+        <nav>
+    
+    <div id="page-nav">
+        <div class="page-nav-item">
+            <a href="/">Home</a>
+        </div>
+        
+            <div class="page-nav-item">
+                <a href="/posts/">
+                    
+                    <span>Posts</span>
+                </a>
+            </div>
+        
+            <div class="page-nav-item">
+                <a href="/resume/">
+                    
+                    <span>Resume</span>
+                </a>
+            </div>
+        
+            <div class="page-nav-item">
+                <a href="/about/">
+                    
+                    <span>About</span>
+                </a>
+            </div>
+        
+            <div class="page-nav-item">
+                <a href="https://github.com/joahn-lab">
+                    
+                    <span>GitHub</span>
+                </a>
+            </div>
+        
+            <div class="page-nav-item">
+                <a href="https://instagram.com/babyblu_deepdown">
+                    
+                    <span>Instagram</span>
+                </a>
+            </div>
+        
+    </div>
+</nav>
+        
+    </header>
+
+
+
+
+
+
+<div id="content">
+    <article class="h-entry">
+        <header>
+            <h1 class="post-title p-name">공간 데이터 다루기</h1>
+            
+            
+        </header>
+        <section class="content e-content">
+            
+
+
+<div id="도입" class="section level2">
+<h2>도입</h2>
+<p>이번 ‘데이터 사이언스 입문’ 수업의 팀 프로젝트에서는 ’응급의료취약지 분석/도출 및 시각화’라는 주제로 공공 api가 제공하는 텍스트 데이터와 행정구역도 공간 데이터를 주로 활용했다. 여기서 공간 데이터는 데이터 용량도 클 뿐만 아니라 별도의 전처리 및 계산법이 필요하기 때문에 로직을 정하고 R 코드를 작성하는데 적지 않은 어려움이 있었다. 그러나 역시 어려울 수록 많이 배우는 것 같다. 직접 작성한 R코드를 한 번 리뷰하면서 공간데이터를 전처리하고 계산하는 법을 소개하도록 하겠다.</p>
+</div>
+<div id="공간-데이터-불러오기" class="section level2">
+<h2>공간 데이터 불러오기</h2>
+<p>공간 데이터 형식인 ESRI shapefile(이하 ‘.shp’)은 위키백과에 ‘a geospatial vector data format for geographic information system (GIS) software’(지리 정보 시스템 소프트웨어를 위한 지리 공간 벡터 데이터 형식)으로 소개되어 있다. 이렇듯 특정 확장자의 파일을 읽으려면 새로운 R 패키지가 필요할 것이다. 여기서는 readOGR() 함수를 포함한 rgdal 패키지를 이용하며, 함께 불러올 sp 패키지는 이름에서도 알 수 있듯 공간데이터 처리를 위함이다.</p>
+<pre class="r"><code>library(sp)
+library(rgdal)</code></pre>
+<p>그리고 공공 데이터 포털에서 미리 api로 호출하여 엑셀로 정리한 ’응급의료기관 기본정보 조회 서비스’와 ’응급의료기관 목록정보 조회 서비스’를 불러와보자. 우선 우리는 응급의료기관 좌표값, 병원명 및 고유번호 정보 정도만을 활용할 것이다.</p>
+<pre class="r"><code>result_table_1 = read_xlsx(&quot;응급의료기관 기본정보 조회 서비스_1.xlsx&quot;) #1은 오퍼레이터 번호
+result_table_3 = read_xlsx(&quot;응급의료기관 목록정보 조회 서비스_3.xlsx&quot;) #3은 오퍼레이터 번호</code></pre>
+<p>이번에는 공간 데이터를 불러오자. 대한민국 행정구역 데이터는 행정안전부 도로명주소 개발자센터 등 국가기관에서 제공하고 있지만 친절하게도 어떤 서비스가 이를 일반 사용자들이 편하고 쉽게 사용할 수 있도록 최신 자료를 별도로 업데이트하고 있다. <a href="http://www.gisdeveloper.co.kr/?p=2332">지오서비스</a>라는 곳인데 여기서 2020년 5월 자료도 게시되어 있어 다운받아 활용하면 좋을 것 같다. ‘리’ 단위 데이터 분석도 가능하지만 우선 시각화의 용이성을 위해 ‘시군구’ 단위 데이터로 가보자. 로직은 행정구역과 상관 없이 동일하다.</p>
+<pre class="r"><code>SIG = readOGR(mylocation, &quot;SIG&quot;)</code></pre>
+<pre><code>## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS
+## = dumpSRS, : Discarded datum International_Terrestrial_Reference_Frame_2000
+## in CRS definition: +proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000
+## +y_0=2000000 +ellps=GRS80 +units=m +no_defs</code></pre>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;C:\Users\Byeongjun Cho\Documents\blog\blog\content\posts&quot;, layer: &quot;SIG&quot;
+## with 250 features
+## It has 3 fields</code></pre>
+</div>
+<div id="좌표계-변환-utm-k에서-wgs84로" class="section level2">
+<h2>좌표계 변환: UTM-K에서 WGS84로</h2>
+<p>자, 그런데 여기서 까다로운 점은 지리 공간 데이터가 어떤 좌표계를 채택하고 있는지 어느 정도 이해하지 않으면 데이터 분석이 잘못되기 쉽다는 점이다. 어떤 좌표계를 선택하여 데이터를 다루든 본인 마음이지만, 데이터별로 좌표계 방식을 통일하지 않으면 거리 계산이 틀려지기 때문인 것도 이유 중 한 가지이다.</p>
+<pre class="r"><code>head(result_table_3)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   hpid     dutyName             wgs84Lon           wgs84Lat          
+##   &lt;chr&gt;    &lt;chr&gt;                &lt;chr&gt;              &lt;chr&gt;             
+## 1 A2200005 의료법인강릉동인병원 128.90714180258507 37.77432579461282 
+## 2 A2200011 강원도강릉의료원     128.8887963251862  37.74931042017154 
+## 3 A2200008 강릉아산병원         128.85771413305145 37.818426685036066
+## 4 A2200038 근로복지공단동해병원 129.1058560226859  37.53232311891651 
+## 5 A2200003 의료법인동해동인병원 129.1074043067605  37.530006805605616
+## 6 A2200007 강원도삼척의료원     129.16370014395005 37.44027922704624</code></pre>
+<p>result_table_3에 수집된 좌표계는 API 가이드라인에도 적혀있듯 WGS84 방식이다. 그런데 우리가 국가로부터 제공받고 이용하는 행정구역도 공간 데이터는 한국에서(만) 주로 이용하는 UTM-K 방식이기 때문에 별도의 변환이 필요하다. 불러온 SIG 데이터는 polygon 좌표를 포함한 공간 데이터와 색인(index)격의 데이터 프레임을 동시에 제공하는데 좌표계 방식은 공간 데이터에 있으므로 여기에 접근하여 좌표계를 바꿔주면 된다.</p>
+<p>UTM-K 좌표계 방식은 <a href="mailto:SIG@proj4string에" class="email">SIG@proj4string에</a> 있는데 이를 “+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs”라고 되어 있을 것이다. 이를 변형해주는 코드는 다음과 같다.</p>
+<pre class="r"><code>to_crs = CRS(&quot;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&quot;)
+SIG_1 = spTransform(SIG, to_crs)</code></pre>
+<p>이제 공간 데이터의 polygon 좌표값 중 2차원 상의 좌표 라벨값인 labpt 항목의 위경도를 추출하여 다음 단계인 거리 계산에 활용하자.</p>
+<pre class="r"><code>tmp_1 = SIG_1@data
+for (i in 1:nrow(tmp_1)){
+  tmp_1$x_coord[i] = parse_number(as.character(SIG_1@polygons[[i]]@labpt)[1])
+  tmp_1$y_coord[i] = parse_number(as.character(SIG_1@polygons[[i]]@labpt)[2])
+}</code></pre>
+<p>거리 계산 후에 이 데이터는 merge() 함수로 공간 데이터에 다시 병합되어 시각화될 것이다. 이렇게 거리 계산을 위해 별도의 tmp_1 테이블을 만드는 이유는, polygon 좌표의 labpt 변수(평면상의 좌표 라벨)만 추출해서 좌표 변환하는 방식이 에러 처리가 어렵기 때문이다. raw 데이터 보존과 파일 용량을 고려하여 이 방식으로 하는 것도 좋을 것 같지만 우선 가능한 방법으로 진행한다. 물론 결과값의 차이는 없다.</p>
+</div>
+<div id="거리-계산-haversine-공식-적용" class="section level2">
+<h2>거리 계산: Haversine 공식 적용</h2>
+<p>우선 좌표계는 이렇게 바꿔주었고, 이제부터 우리는 프로젝트에서 중요한 태스크 중 하나인 거리 계산을 해야한다. 여기서의 거리 계산은 행정구역별 대표 좌표값과 공식 지정 응급의료기관 사이의 거리가 얼마나 되는지에 대해서인데, 본 프로젝트에서는 거리 기준(30km)을 만족한 응급의료기관의 직접 산출한 병원점수를 합산하는 방식으로 접근성을 분석/시각화했다면 여기서는 우선 거리 기준(30km)을 만족하는 응급의료기관의 갯수를 행정구역별로 계산하는 단계까지 적용해보겠다.</p>
+<p>거리 계산 공식은 유클리디안(Euclidean) 거리 공식이 아닌 하버사인 공식을 이용한다. 단순히 말해서 <strong>지구가 평면이 아닌 구의 형태를 하고 있어 곡면상의 두 지점의 거리를 구하기 위할 때는 하버사인 공식이 보다 높은 정확도를 기하기 때문이다.</strong> 하버사인 공식으로 거리를 계산하는 함수가 몇몇 R 패키지에 있지만, 그 중에서 필요 인자값이 우리가 가진 데이터 값과 거의 동일하여 전처리가 쉬운 geosphere 패키지의 distHaversine() 함수를 이용하기로 한다.</p>
+<p>인자값을 얻기 위한 전처리로는 dist와 medi 두 리스트에 각각 위경도 수치를 넣어주는 것 뿐이다. dist에는 행정구역별 좌표값, medi에는 약 400개의 공식 지정 응급의료기관 좌표값이 들어간다.</p>
+<pre class="r"><code>dist = list()
+for (i in 1:nrow(tmp_1)){
+dist[[i]] = c(tmp_1$x_coord[i], tmp_1$y_coord[i])
+}
+
+medi = list()
+for (i in 1:nrow(result_table_3)){
+  medi[[i]] = c(parse_number(result_table_3$wgs84Lon[i]), parse_number(result_table_3$wgs84Lat[i]))
+}</code></pre>
+<p>이제 30km 이내에 도달 가능한 응급의료기관 수를 계산하자. 참고로 30km라는 기준은 정부가 응급의료분야 의료취약지를 선정하는 법적 기준인 ‘공공보건의료에 관한 법률’ 제12조 제2항 및 제3항의 지역내 30% 이상의 인구가 ’지역응급의료센터로 30분 이내 도달이 불가능한 경우’를 참고하여 설정한 기준이다. 인근 구급차가 사고 발생 지역으로 출동하여 환자에게 간이 응급처치 후 응급의료기관 위치와 수용가능현황을 파악하여 수송하는 단계를 고려했을 때 30km가 최소한의 거리라고 판단한 것이다.</p>
+<p>다음과 같은 for문 계산이 끝나면 tmp_1 테이블의 num 변수에는 시군구별 30km 내 접근 가능 응급의료기관의 갯수가 나올 것이다.</p>
+<pre class="r"><code># 거리 계산하여 30km 이내에 도달 가능한 응급의료기관 수 계산
+
+library(geosphere)
+
+tmp_1$num = 0
+for (i in 1:length(dist)){
+  for (j in 1:length(medi)){
+  ifelse(distHaversine(dist[[i]], medi[[j]])&lt;30000, tmp_1$num[i] &lt;- tmp_1$num[i]+1, next)
+  }
+}
+
+SIG_1 = sp::merge(SIG_1, tmp_1)</code></pre>
+<p>앞서 언급한 대로 num 변수가 산출되어 저장된 tmp_1을 공간데이터 SIG_1와 병합했다.</p>
+<div id="간단한-시각화-leaflet-패키지" class="section level3">
+<h3>간단한 시각화: leaflet 패키지</h3>
+<p>이제 새롭게 병합한 공간 데이터로 <strong>leaflet 패키지</strong>를 통해 시각화해보자. 시각화의 밑그림이 되어주는 지도로는 Mapbox를 사용한다. 물론 CartoDB.Positron이나 이외 지도를 사용해도 상관없다.</p>
+<p>우선 summary(<a href="mailto:SIG_1@data$num" class="email">SIG_1@data$num</a>)를 통해 qunatile값을 확인하고 이에 맞게 색깔 부여 기준값을 정하자. 물론 스펙트럼으로 색을 설정하여 알아서 부여하도록 할 수 있다.</p>
+<p>pal2 = colorNumeric(“viridis”, <a href="mailto:SIG_1@data$num" class="email">SIG_1@data$num</a>, reverse=TRUE)와 같은 식으로 가능하다. 그러나 명목형으로 구분하는 방식으로 해보자.</p>
+<pre class="r"><code>summary(SIG_1@data$num)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    5.00   12.50   27.85   36.75  102.00</code></pre>
+<p>labels 변수로 행정구역별 label과 해당값을 넣어주고 커서가 움직일 때 나타나는 기능까지 추가해보자. 어려워 보이지만 leaflet 패키지의 상호작용성은 생각보다 훨씬 versatile하다. 다방면으로 활용 가능해 보인다.</p>
+<p>참고로 YlGNBU는 컬러 스펙트럼 코드 중 하나다. 노랑(Yellow)부터 초록(Green)을 지나 파랑(Blue)까지 분포하는 스펙트럼인데 붉은 계열인 ’YlOrRd’를 써도 상관 없다. 이는 나타내고자 하는 바와 어느 정도 시각적/직관적으로 호응하는지에 따라 사용하면 사용자 경험(UX)에 보다 충실할 수 있을 것이다.</p>
+<pre class="r"><code>library(leaflet)
+
+bins = c(0, 5, 12.5, 27.85, 36.75, 73.5, Inf)
+pal = colorBin(&quot;YlGnBu&quot;, domain = SIG_1@data$num, bins = bins)
+
+labels &lt;- sprintf(
+    &quot;&lt;strong&gt;%s&lt;/strong&gt;&lt;br/&gt;%g points&quot;,
+    SIG_1@data$SIG_ENG_NM, SIG_1@data$num
+) %&gt;% lapply(htmltools::HTML)
+
+leaflet(SIG_1) %&gt;%
+            setView(lng=127.7669,lat=35.90776, zoom=7.5) %&gt;%
+            addProviderTiles(&quot;MapBox&quot;, options = providerTileOptions(
+                id = &quot;mapbox.light&quot;,
+                accessToken = Sys.getenv(&#39;MAPBOX_ACCESS_TOKEN&#39;))) %&gt;%
+            addPolygons(color=&#39;#444444&#39;, 
+                        weight=2, opacity = 1.0, fillOpacity = 0.5, 
+                        fillColor=~pal(num),
+                        label = labels,
+                        labelOptions = labelOptions(
+                            style = list(&quot;font-weight&quot; = &quot;normal&quot;, padding = &quot;3px 8px&quot;),
+                            textsize = &quot;15px&quot;,
+                            direction = &quot;auto&quot;)) %&gt;%
+            addLegend(pal = pal, values = ~num, opacity = 0.7, title = &quot;Emergency Score&quot;,
+                      position = &quot;bottomright&quot;)</code></pre>
+<div class="figure">
+<img src="screenshot.png" alt="leaflet" />
+<p class="caption">leaflet</p>
+</div>
+<p>포스트에 동적 시각화 구현이 어려워 우선 이미지 파일로 결과를 확인한다. 간단한 범례까지 추가했다. 색 분포를 대강 봐도 수도권과 위성도시에 접근 용이성이 편중되어 있음을 알 수 있다.</p>
+<style>
+body {
+  font-family: NanumGothic;
+  fontsize = 8px
+}
+</style>
+</div>
+</div>
+
+        </section>
+        <footer>
+            <a class="permalink u-url" href="/posts/2020-06-17-spatial-data/"></a>
+            
+        </footer>
+    </article>
+</div>
+
+    
+    <div id="footer">
+      
+      <nav id="article-skip">
+        <div class="next">
+          
+          <a alt="Newer article" href="/2015/07/23/hello-r-markdown/">&larr; Newer</a>
+          
+        </div>
+        <div class="top">
+          <a alt="Top of page" href="#">Top</a>
+        </div>
+        <div class="prev">
+          
+          <p>&nbsp;</p>
+          
+        </div>
+      </nav>
+      
+      <aside id="social">
+  <div id="social-icons">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </div>
+</aside>
+
+      
+      <p class="copyright">
+          Copyright &amp;copy; 2019 - Author Name
+      </p>
+      
+    </div>
+
+
+</body>
+</html>

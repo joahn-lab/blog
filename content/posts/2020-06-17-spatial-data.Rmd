@@ -1,8 +1,11 @@
 ---
-title: "공간 데이터 다루기"
+title: "Spatial data in golden time project"
 author: "joahn-lab"
 date: '2020-6-17'
+slug: spatial-data
 output: html_document
+tags: []
+categories: []
 ---
 
 ```{r setup, include=FALSE}
@@ -125,7 +128,7 @@ labels 변수로 행정구역별 label과 해당값을 넣어주고 커서가 �
 
 참고로 YlGNBU는 컬러 스펙트럼 코드 중 하나다. 노랑(Yellow)부터 초록(Green)을 지나 파랑(Blue)까지 분포하는 스펙트럼인데 붉은 계열인 'YlOrRd'를 써도 상관 없다. 이는 나타내고자 하는 바와 어느 정도 시각적/직관적으로 호응하는지에 따라 사용하면 사용자 경험(UX)에 보다 충실할 수 있을 것이다.
 
-```{r}
+```{r, eval=FALSE}
 library(leaflet)
 
 bins = c(0, 5, 12.5, 27.85, 36.75, 73.5, Inf)
@@ -152,8 +155,6 @@ leaflet(SIG_1) %>%
             addLegend(pal = pal, values = ~num, opacity = 0.7, title = "Emergency Score",
                       position = "bottomright")
 ```
-
-간단한 범례까지 추가했다. 색 분포를 대강 봐도 수도권과 위성도시에 접근 용이성이 편중되어 있음을 알 수 있다.
 
 <style>
 body {
