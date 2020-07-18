@@ -1,53 +1,2110 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Posts on Joahn-lab</title>
-    <link>/posts/</link>
-    <description>Recent content in Posts on Joahn-lab</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <copyright>Copyright &amp;copy; 2019 - Author Name</copyright>
-    <lastBuildDate>Sat, 13 Jun 2020 00:00:00 +0000</lastBuildDate>
+
+   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+     <channel>
+       <title>Posts on Joahn-lab</title>
+       <link>/posts/</link>
+       <description>Recent content in Posts on Joahn-lab</description>
+       <generator>Hugo -- gohugo.io</generator>
+       <copyright>Copyright &amp;copy; 2019 - Joahn</copyright>
+       <lastBuildDate>Sat, 18 Jul 2020 00:00:00 +0000</lastBuildDate>
+       
+           <atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+       
+       
+       <item>
+         <title>BA Analytics report</title>
+         <link>/posts/2020-07-18-ba-analytics/</link>
+         <pubDate>Sat, 18 Jul 2020 00:00:00 +0000</pubDate>
+         
+         <guid>/posts/2020-07-18-ba-analytics/</guid>
+         <description>
+
+
+&lt;div id=&#34;customer-satisfaction-data-analysis-in-us-airline-services&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Customer Satisfaction Data Analysis in US Airline Services&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Table of contents
+Abstract
+1. Motivation
+2. Data explanation
+3. Analysis
+3.1. Data exploration
+3.1.1 Correlation coefficient
+3.1.2. Simple linear regression
+3.2. Data visualization
+3.2.1. Non-Likert-scale factors on satisfaction
+3.2.2. Likert-scale factors on satisfaction
+3.3. Classification modelling
+3.3.1. Tree model / RP, CI tree and Random forest models
+3.3.2 Logistic regression model
+4. Conclusion (omitted)
+4.1. Algorithm recommendations (omitted)
+4.2. Practical conclusion (omitted)
+*References&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;abstract&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;Abstract&lt;/h4&gt;
+&lt;p&gt;With the development of the aviation industry in recent years, there has been surging needs for business analysis about customer convenience in flights, especially in the US. But the bottom line is within a year after this high reputation, in the crisis of this worldwide COVID-19 outbreak, all the airline services and the whole industry got a huge damage on their own businesses due to every country’s current travel restrictions and social distancing policies.
+So, what we have decided is to analyze how we can suggest to make airlines perform in a quite competitive manner. How will they fly again to risk this situation and attract their customers who want their needs to be satisfied? We analyzed the US airlines customer satisfaction dataset in several ways, following EDA, visualizations with ggplot(), and classification modelling to get more sense of satisfaction analysis. We want to help make breakthroughs now of crisis for airlines by harnessing the analysis skills we’ve learned from this class.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;motivation&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;1. Motivation&lt;/h4&gt;
+&lt;p&gt;With the development of the aviation industry in recent years, there has been surging needs for business analysis about customer convenience in flights, especially in the US. According to an article called “Consumer satisfaction in the skies soars to record high in annual airline travel survey” published in CNBC last year, “2019 North American Airline Satisfaction Survey shows travelers gave the industry a record-high score, with the biggest improvements coming from so-called legacy carriers.” It is strongly sure that this improvement about proficiency in customer service has helped airlines record high sales.
+But the bottom line is within a year after this high reputation, in the crisis of this worldwide COVID-19 outbreak, all the airline services and the whole industry got a huge damage on their own businesses due to every country’s current travel restrictions and social distancing policies. As a matter of fact, &lt;a href=&#34;https://www.cnbc.com/quotes/?symbol=BRK.A&#34;&gt;“Warren Buffett said Berkshire Hathaway sold its entire stakes in the four largest U.S. carriers as coronavirus devastates travel demand.”&lt;/a&gt; last month. The four, which are well-known as four major airlines in US flight industries, “American”, “Delta”, “United”, “Southwest”, &lt;a href=&#34;https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html&#34;&gt;“had posted their first quarterly losses in years, and warned of a slow recovery in demand from pre-pandemic levels. Even the CEO of Delta airlines said it could take 2 to 3 years from now.”&lt;/a&gt; And not surprisingly, carriers in South Korea suffer the similar situation in industry and businesses.
+So, what we have decided is to analyze how we can suggest to make airlines perform in a quite competitive manner. How will they fly again to risk this situation and attract their customers who want their needs to be satisfied? And moreover, how can this strategy be coordinated with the country’s travel restrictions and social distancing? We wanted to help make breakthroughs now of crisis for airlines by harnessing the analysis skills we’ve learned from this class.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data-explanation&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;2. Data Explanation&lt;/h4&gt;
+&lt;p&gt;Our dataset for analysis on the research paper is posted in Kaggle, this dataset deals with US airlines satisfaction survey, and contains 24 columns in about 130000 observations. Short descriptions about 24 columns provided by &lt;a href=&#34;https://www.kaggle.com/johndddddd/customer-satisfaction&#34;&gt;the publisher of this dataset in Kaggle&lt;/a&gt;, are as follows in the table.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf = read_xlsx(&amp;quot;satisfaction.xlsx&amp;quot;)
+sf&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 129,880 x 24
+##        id satisfaction_v2 Gender `Customer Type`   Age `Type of Travel` Class
+##     &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;           &amp;lt;chr&amp;gt;  &amp;lt;chr&amp;gt;           &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;            &amp;lt;chr&amp;gt;
+##  1  11112 satisfied       Female Loyal Customer     65 Personal Travel  Eco  
+##  2 110278 satisfied       Male   Loyal Customer     47 Personal Travel  Busi~
+##  3 103199 satisfied       Female Loyal Customer     15 Personal Travel  Eco  
+##  4  47462 satisfied       Female Loyal Customer     60 Personal Travel  Eco  
+##  5 120011 satisfied       Female Loyal Customer     70 Personal Travel  Eco  
+##  6 100744 satisfied       Male   Loyal Customer     30 Personal Travel  Eco  
+##  7  32838 satisfied       Female Loyal Customer     66 Personal Travel  Eco  
+##  8  32864 satisfied       Male   Loyal Customer     10 Personal Travel  Eco  
+##  9  53786 satisfied       Female Loyal Customer     56 Personal Travel  Busi~
+## 10   7243 satisfied       Male   Loyal Customer     22 Personal Travel  Eco  
+## # ... with 129,870 more rows, and 17 more variables: `Flight Distance` &amp;lt;dbl&amp;gt;,
+## #   `Seat comfort` &amp;lt;dbl&amp;gt;, `Departure/Arrival time convenient` &amp;lt;dbl&amp;gt;, `Food and
+## #   drink` &amp;lt;dbl&amp;gt;, `Gate location` &amp;lt;dbl&amp;gt;, `Inflight wifi service` &amp;lt;dbl&amp;gt;,
+## #   `Inflight entertainment` &amp;lt;dbl&amp;gt;, `Online support` &amp;lt;dbl&amp;gt;, `Ease of Online
+## #   booking` &amp;lt;dbl&amp;gt;, `On-board service` &amp;lt;dbl&amp;gt;, `Leg room service` &amp;lt;dbl&amp;gt;,
+## #   `Baggage handling` &amp;lt;dbl&amp;gt;, `Checkin service` &amp;lt;dbl&amp;gt;, Cleanliness &amp;lt;dbl&amp;gt;,
+## #   `Online boarding` &amp;lt;dbl&amp;gt;, `Departure Delay in Minutes` &amp;lt;dbl&amp;gt;, `Arrival Delay
+## #   in Minutes` &amp;lt;dbl&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As suggested, out of 24 variables, 4 are continuous, 5 are nominal, and 14 are ordinal variables. And we should notice that these ordinal variables include 0, which means NA value out of scale of 1-5, to make sense of preprocessing NA values further. Basically, there has demographic information such as ‘Age’ and ‘Gender’. Moreover, customer type, class (of seats) and flight distance are noted, and additive information about flight delay is also suggested. Most importantly, ‘satisfaction_v2’ summarizes the overall satisfaction by customers who answered this questionnaire. We can guess that there might be correlation between this comprehensive variable and the other service evaluations variables.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data-analysis&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;3. Data Analysis&lt;/h4&gt;
+&lt;div id=&#34;data-exploration&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;3.1. Data exploration&lt;/h5&gt;
+&lt;p&gt;Let’s get down to summarizing our dataset with skimr::skim() function, which has a better performance than summary() function does.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;skimr::skim(sf)&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+&lt;caption&gt;&lt;span id=&#34;tab:unnamed-chunk-2&#34;&gt;Table 1: &lt;/span&gt;Data summary&lt;/caption&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Name&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;sf&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Number of rows&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;129880&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Number of columns&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;24&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;_______________________&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Column type frequency:&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;character&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;numeric&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;19&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;________________________&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Group variables&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;None&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Variable type: character&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;skim_variable&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;n_missing&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;complete_rate&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;min&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;max&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;empty&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;n_unique&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;whitespace&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;satisfaction_v2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;9&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;23&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Gender&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Customer Type&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;14&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;17&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Type of Travel&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Class&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;8&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Variable type: numeric&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;skim_variable&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;n_missing&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;complete_rate&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;mean&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;sd&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p0&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p25&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p50&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p75&lt;/th&gt;
+&lt;th align=&#34;right&#34;&gt;p100&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;hist&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;id&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;64940.50&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;37493.27&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;32470.75&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;64940.5&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;97410.25&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;129880&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▇▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Age&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;39.43&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;7&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;27.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;40.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;51.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;85&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▇▇▅▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Flight Distance&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1981.41&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1027.12&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;50&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1359.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1925.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2544.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;6951&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▇▂▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Seat comfort&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.84&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.39&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▇▇▅&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Departure/Arrival time convenient&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.99&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.53&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▆▆▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Food and drink&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.85&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.44&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▇▇▇▆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Gate location&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.99&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.31&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▆▆▇▇▅&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Inflight wifi service&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.25&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.32&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▇▇▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Inflight entertainment&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.38&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.35&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▃▅▇▆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Online support&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.52&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.31&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▃▅▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Ease of Online booking&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.47&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.31&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▃▅▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;On-board service&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.47&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.27&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▂▃▅▇▆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Leg room service&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.49&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.29&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▂▅▅▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Baggage handling&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.70&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.16&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▁▂▅▇▆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Checkin service&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.34&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.26&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▃▇▇▆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Cleanliness&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.71&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.15&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▁▂▃▇▆&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Online boarding&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;3.35&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1.30&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;2.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;4.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;5&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▃▅▇▇▇&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Departure Delay in Minutes&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;14.71&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;38.07&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;12.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1592&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▁▁▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Arrival Delay in Minutes&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;393&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;15.09&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;38.47&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;0.0&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;13.00&lt;/td&gt;
+&lt;td align=&#34;right&#34;&gt;1584&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;▇▁▁▁▁&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;In this skim result, this dataset has similar shapes with normal distribution in ages and flight distances. Moreover, many of the respective satisfaction items have 3-4 in mean values, which implies that customers in general are satisfied with airline services overall. Because 5 Likert-scale variables do not count zero as applicable, there are no NA values instead, except for ‘Departure/Arrival delay in minutes’ concerned with special events like delay.&lt;/p&gt;
+&lt;div id=&#34;correlation-coefficient&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;3.1.1. Correlation coefficient&lt;/h6&gt;
+&lt;p&gt;It is better to remain 0 values in 5 Likert-scale variables, rather than changing them with NA. It is because we cannot run correlation tests with numeric variables which have NA values. So, we didn’t consider preprocessing them.
+The coefficient tables with Pearson correlation tests are as follows.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf.num = sf %&amp;gt;% mutate(Satisfied_num = ifelse(satisfaction_v2 == &amp;#39;satisfied&amp;#39;, 1, 0), Class_num = case_when(Class == &amp;#39;Eco&amp;#39; ~ 0, Class == &amp;#39;Eco Plus&amp;#39; ~ 1, Class == &amp;#39;Business&amp;#39; ~ 2), Type_num = case_when(`Type of Travel` == &amp;#39;Personal Travel&amp;#39; ~ 0, `Type of Travel` == &amp;#39;Business travel&amp;#39; ~ 1), Loyal_num = ifelse(`Customer Type` == &amp;#39;Loyal Customer&amp;#39;, 1, 0))
+sf.num = sf.num[, sapply(sf.num, is.numeric)]
+
+corrplot::corrplot(cor(sf.num), method = &amp;quot;shade&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;To make correlation tests possible, we had to make variables countable, that is, numeric. Shortly, we converted character variables such as ‘satisfaction_v2’, ‘Type of Travel’, ‘Customer Type’ and ‘Class’ into numeric which are counted on our own. This plot is supposed to be made to get a better understanding regarding the relationship between variables, allowing us to make numeric labels on our own. We counted ‘Eco’ seats, ‘Personal Travel’, ‘disloyal customers’, and ‘neutral or dissatisfied’ with 0, and 1 or 2 with vice versa.
+Through correlation plot, there seems to be some positive relationship from ‘Seat comfort’ to ‘Gate location’, and from ‘Inflight wifi service’ to ‘Online boarding’. Besides, there seems positive correlation between converted variables. On top of that, regarding ‘Satisfied_num’ which stands for the most comprehensive variable, many of 5 Likert-scale variables seem to have some positive correlations with this variable. So, we can closely look into these parts further.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simple-linear-regression&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;3.1.2. Simple linear regression&lt;/h6&gt;
+&lt;p&gt;With a simple linear regression test with lm() and tidy(), which summarizes the test in tibble, the result is as follows. The dependent variable is a dummy value labelled ‘Satisfied_num’, which counts 1 with ‘satisfied’ response, and 0 with ‘neutral or dissatisfied’ response.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lm(Satisfied_num~., data = sf.num[,c(2:17, 20)]) %&amp;gt;% broom::tidy()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 17 x 5
+##    term                                   estimate std.error statistic   p.value
+##    &amp;lt;chr&amp;gt;                                     &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;
+##  1 (Intercept)                         -0.675        7.07e-3    -95.5  0.       
+##  2 Age                                  0.00104      7.42e-5     14.1  6.79e- 45
+##  3 `Flight Distance`                   -0.00000238   1.07e-6     -2.22 2.62e-  2
+##  4 `Seat comfort`                       0.0293       1.18e-3     24.9  1.51e-136
+##  5 `Departure/Arrival time convenient` -0.0274       9.00e-4    -30.4  1.90e-202
+##  6 `Food and drink`                    -0.0284       1.21e-3    -23.4  2.07e-120
+##  7 `Gate location`                      0.0191       1.06e-3     18.0  2.51e- 72
+##  8 `Inflight wifi service`             -0.0152       1.15e-3    -13.3  4.68e- 40
+##  9 `Inflight entertainment`             0.141        1.05e-3    134.   0.       
+## 10 `Online support`                     0.0279       1.24e-3     22.5  1.78e-111
+## 11 `Ease of Online booking`             0.0559       1.58e-3     35.4  9.54e-274
+## 12 `On-board service`                   0.0503       1.12e-3     45.1  0.       
+## 13 `Leg room service`                   0.0380       9.68e-4     39.3  0.       
+## 14 `Baggage handling`                   0.00552      1.27e-3      4.34 1.44e-  5
+## 15 `Checkin service`                    0.0377       9.27e-4     40.7  0.       
+## 16 Cleanliness                          0.00275      1.31e-3      2.09 3.65e-  2
+## 17 `Online boarding`                    0.00724      1.34e-3      5.40 6.76e-  8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(Age~satisfaction_v2, data = sf, col = &amp;quot;sky blue&amp;quot;, border= &amp;quot;purple&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;boxplot(sf$`Inflight wifi service`~sf$satisfaction_v2, data = sf, col = &amp;quot;sky blue&amp;quot;, border= &amp;quot;purple&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-5-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;With this simple test, we confirmed significance between overall satisfaction and respective items for airline services. However, we cannot assert a simple linear relationship between them with ease. That is, though we might find them relatable in some senses due to lots of accountable variables in models, we should note that the positive/negative relationships suggested above are not necessarily true.
+For instance, in the simple lm() model, it is suggested that Age has a negative influence on ‘Satisfied_num’, and even satisfaction on ‘Inflight wifi service’ does too. However, in the boxplots, we may notice more increase both for two numeric variables in satisfied groups than in neutral/dissatisfied groups. Therefore, it would be only enough to conclude that there is an overall positive statistical significance in respective satisfaction items on ‘Satisfied_num’, and a slightly negative significance in ‘Personal travel’, ‘Economy class’, ‘long-distance journey’ groups.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data-visualization&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;3.2. Data visualization&lt;/h5&gt;
+&lt;p&gt;With EDA above, we found some interesting insights on this dataset. Now we want to articulate these tendencies into ggplot graphs with sophisticated visualizations. What we want here is to make clear which factors ‘satisfaction _v2’, key value in this dataset which stands for customer satisfaction, has much to do with.
+Here are checklists we would like to confirm, based on some interesting insights suggested above in the last part.&lt;/p&gt;
+&lt;div id=&#34;non-likert-scale-factors-on-satisfaction&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;3.2.1. Non-likert scale factors on satisfaction&lt;/h6&gt;
+&lt;p&gt;We already saw that ‘Type of Travel’, ‘Flight distances’ and ‘Customer Type’ has to do with overall satisfaction variables. Therefore, we may look closely at these relationships with geom_bar() and geom_histogram().&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-type-of-travelcustomer-type-on-satisfaction&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;(a) Type of travel/Customer type on satisfaction&lt;/h6&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf %&amp;gt;%
+  ggplot(aes(x = `Type of Travel`, fill = satisfaction_v2)) +
+  geom_bar(aes(x = `Type of Travel`))+
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As you see above, Business travelers have satisfied more than personal travels have, and we can easily see the proportional differences in color between two groups.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf %&amp;gt;%
+  ggplot(aes(fill = satisfaction_v2)) +
+  geom_bar(aes(x = `Customer Type`)) +
+  theme_bw() +
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In this graph, although we notice that there are much more loyal customers counted, it is reported that loyal customers tend to be much more satisfied with overall services than their counterparts.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;b-flight-distances-on-satisfaction&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;(b) Flight distances on satisfaction&lt;/h6&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf %&amp;gt;%
+  ggplot(aes(x = `Flight Distance`, fill = satisfaction_v2)) +
+  geom_histogram() +
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In this histogram suggesting counts on continuous flight distances, we find that only from 1000 to 3000km long, where most customers are covered, satisfaction level is similar with each other while customers are likely to report satisfaction in other ranges. Therefore, it is hard to simply suggest a linear relationship between flight distances and overall satisfaction.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;likert-scale-factors-on-satisfaction&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;3.2.2. Likert-scale factors on satisfaction&lt;/h6&gt;
+&lt;p&gt;We will focus on two Likert-scale factors, which were reported to have a negative relationship with overall satisfaction. It does not make sense to general thinking, and after looking at the graph we made, we will decide if it is better to get rid of these variables out of model.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf %&amp;gt;%
+  ggplot(aes(x = `Food and drink`, fill = satisfaction_v2)) +
+  geom_histogram() +
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The first one is ‘Food and drink’ satisfaction item. There is a slight increase in proportion of ‘satisfied’ customers in 4-5 point. However, we couldn’t see a clear estimate in EDA, due to 1-3 points where there is no increase in proportion of ‘satisfied’ customers. We can guess as ‘food and drink’ is available at such level, people don’t much care about this item. But since this variable doesn’t seem to harm classification modelling, we can keep that in later models.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf %&amp;gt;%
+  ggplot(aes(x = `Departure/Arrival time convenient`, fill = satisfaction_v2)) +
+  geom_histogram() +
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The second one is ‘Departure/Arrival time convenient’ variable. There shows a similar tendency as ‘Food and drink’. It means that, if they are not so bothered with inconvenience of unpunctuality, they don’t find this variable as important for their satisfaction. However, there is a slight and positive tendency as we see on the graph, which might help classify ‘satisfied’ customers in later models. So, we can keep these two Likert-scale variables.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;classification-modelling&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;3.3. Classification modelling&lt;/h5&gt;
+&lt;p&gt;We’ve run classification models which we’ve learned in this course and thought to be proper in this dataset, giving random index with set.seeds(1234) to split train set/test set with probability of 0.7/0.3. And first, here is a simple summary table with sensitivity/specificity and accuracy estimates on each model.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;RP Tree
+Accuracy: 0.8649
+Sensitivity/Specificity : 0.8584/0.8703
+CI Tree
+Accuracy: 0.9399
+Sensitivity/Specificity : 0.9393/0.9404
+Random forest
+Accuracy: 0.9564
+Sensitivity/Specificity : 0.9608/0.9527
+Logistic regression
+Accuracy: 0.8339
+Sensitivity/Specificity : (best cut-off; 0.610/ 0.8/0.88) 0.8496/0.8151
+Naïve Bayes
+Accuracy : 0.8103
+Sensitivity/Specificity :0.7728/0.8416
+* * *&lt;/p&gt;
+&lt;p&gt;With these 5 models above, ‘Random forest’ classification model showed the best proficiency in accuracy in this case, while Naive Bayes showed the least. All these variables in the model are correlated, not independent each other as presumed in Naive Bayes theory. Now let’s look at the short analysis in each model, except for Naive Bayes model which showed the least proficiency to predict proper satisfaction.&lt;/p&gt;
+&lt;div id=&#34;tree-model-rp-ci-tree-and-random-forest-models&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;3.3.1. Tree model / RP, CI tree and Random forest models&lt;/h6&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;##########
+# RP tree
+##########
+
+set.seed(1234) # I checked for 3 seeds, &amp;#39;1234&amp;#39;, &amp;#39;1000&amp;#39;, &amp;#39;4321&amp;#39;
+index = sample(2, nrow(sf), replace = TRUE, prob = c(0.7, 0.3))
+trainset = sf[index==1,]
+testset = sf[index==2,]
+dim(trainset)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 90994    24&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dim(testset)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 38886    24&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sf.rp = rpart::rpart(satisfaction_v2~., data = trainset)
+sf.rp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## n= 90994 
+## 
+## node), split, n, loss, yval, (yprob)
+##       * denotes terminal node
+## 
+##  1) root 90994 41097 satisfied (0.451645163 0.548354837)  
+##    2) Inflight entertainment&amp;lt; 3.5 40684  8808 neutral or dissatisfied (0.783502114 0.216497886)  
+##      4) Seat comfort&amp;lt; 3.5 35562  5178 neutral or dissatisfied (0.854395141 0.145604859)  
+##        8) Seat comfort&amp;gt;=0.5 33707  3331 neutral or dissatisfied (0.901177797 0.098822203) *
+##        9) Seat comfort&amp;lt; 0.5 1855     8 satisfied (0.004312668 0.995687332) *
+##      5) Seat comfort&amp;gt;=3.5 5122  1492 satisfied (0.291292464 0.708707536) *
+##    3) Inflight entertainment&amp;gt;=3.5 50310  9221 satisfied (0.183283641 0.816716359)  
+##      6) Ease of Online booking&amp;lt; 3.5 13801  5674 satisfied (0.411129628 0.588870372)  
+##       12) Inflight entertainment&amp;lt; 4.5 9381  4294 neutral or dissatisfied (0.542266283 0.457733717)  
+##         24) Online support&amp;lt; 4.5 8110  3222 neutral or dissatisfied (0.602712700 0.397287300) *
+##         25) Online support&amp;gt;=4.5 1271   199 satisfied (0.156569630 0.843430370) *
+##       13) Inflight entertainment&amp;gt;=4.5 4420   587 satisfied (0.132805430 0.867194570) *
+##      7) Ease of Online booking&amp;gt;=3.5 36509  3547 satisfied (0.097154126 0.902845874) *&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(sf.rp, uniform=TRUE, branch=0.1, margin=0.1)
+text(sf.rp, all=TRUE, use.n=TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As the plot above in RP tree model suggests, the survey factor which mainly classifies the overall satisfaction was ‘Inflight entertainment’, which we saw the highest coefficient estimate in simple linear regression model. Additionally, we found that there are 5-6 Likert-scale factors mainly included in decision tree.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predictions = predict(sf.rp, testset, type=&amp;quot;class&amp;quot;)
+table(predictions, testset$satisfaction_v2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                          
+## predictions               neutral or dissatisfied satisfied
+##   neutral or dissatisfied                   15191      2749
+##   satisfied                                  2505     18441&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;confusionMatrix(table(predictions, testset$satisfaction_v2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Confusion Matrix and Statistics
+## 
+##                          
+## predictions               neutral or dissatisfied satisfied
+##   neutral or dissatisfied                   15191      2749
+##   satisfied                                  2505     18441
+##                                                  
+##                Accuracy : 0.8649                 
+##                  95% CI : (0.8614, 0.8683)       
+##     No Information Rate : 0.5449                 
+##     P-Value [Acc &amp;gt; NIR] : &amp;lt; 2.2e-16              
+##                                                  
+##                   Kappa : 0.7279                 
+##                                                  
+##  Mcnemar&amp;#39;s Test P-Value : 0.000801               
+##                                                  
+##             Sensitivity : 0.8584                 
+##             Specificity : 0.8703                 
+##          Pos Pred Value : 0.8468                 
+##          Neg Pred Value : 0.8804                 
+##              Prevalence : 0.4551                 
+##          Detection Rate : 0.3907                 
+##    Detection Prevalence : 0.4613                 
+##       Balanced Accuracy : 0.8644                 
+##                                                  
+##        &amp;#39;Positive&amp;#39; Class : neutral or dissatisfied
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rpart::plotcp(sf.rp)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This is the result graph on plotcp(). We saw that this RP tree showed the least X-Error on Y axis, when separated with 7 groups. That’s why there are only 6 main variables in our RP tree model. However, we can go further with CI tree model after converting some character variables into factor variables to apply this model. As suggested above the table, CI tree show high accuracy over .9 and well-balanced sensitivity/specificity for each, without any further pruning process since this method uses significance to prune the tree.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;##########
+# CI tree
+##########
+
+# Pre-processing before prdictions
+
+sf$satisfaction_v2 = as.factor(sf$satisfaction_v2)
+sf$Gender= as.factor(sf$Gender)
+sf$`Customer Type` = as.factor(sf$`Customer Type`)
+sf$`Type of Travel` = as.factor(sf$`Type of Travel`)
+sf$Class = as.factor(sf$Class)
+
+sf.name = sf %&amp;gt;% colnames() %&amp;gt;% str_replace_all(&amp;quot; &amp;quot;,&amp;quot;&amp;quot;)
+sf.df.name = sf %&amp;gt;% setNames(sf.name)
+
+trainset.ci = sf[index==1,]
+testset.ci = sf[index==2,]
+
+sf.ci = ctree(satisfaction_v2 ~ ., data=trainset.ci)
+# sf.ci
+# plot(sf.ci)
+
+predictions = predict(sf.ci, testset.ci)
+table(predictions, testset.ci$satisfaction_v2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                          
+## predictions               neutral or dissatisfied satisfied
+##   neutral or dissatisfied                   16621      1263
+##   satisfied                                  1075     19927&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;confusionMatrix(table(predictions, testset.ci$satisfaction_v2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Confusion Matrix and Statistics
+## 
+##                          
+## predictions               neutral or dissatisfied satisfied
+##   neutral or dissatisfied                   16621      1263
+##   satisfied                                  1075     19927
+##                                                  
+##                Accuracy : 0.9399                 
+##                  95% CI : (0.9375, 0.9422)       
+##     No Information Rate : 0.5449                 
+##     P-Value [Acc &amp;gt; NIR] : &amp;lt; 2e-16                
+##                                                  
+##                   Kappa : 0.8789                 
+##                                                  
+##  Mcnemar&amp;#39;s Test P-Value : 0.00011                
+##                                                  
+##             Sensitivity : 0.9393                 
+##             Specificity : 0.9404                 
+##          Pos Pred Value : 0.9294                 
+##          Neg Pred Value : 0.9488                 
+##              Prevalence : 0.4551                 
+##          Detection Rate : 0.4274                 
+##    Detection Prevalence : 0.4599                 
+##       Balanced Accuracy : 0.9398                 
+##                                                  
+##        &amp;#39;Positive&amp;#39; Class : neutral or dissatisfied
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;##########
+# Random Forest
+##########
+
+sf = sf[,2:22]
+sf.name = sf %&amp;gt;% colnames() %&amp;gt;% str_replace_all(&amp;quot; &amp;quot;,&amp;quot;&amp;quot;)
+sf.df.name = sf %&amp;gt;% setNames(sf.name)
+
+trainset.rf = sf.df.name[index==1,]
+testset.rf = sf.df.name[index==2,]
+
+sf.rf = randomForest(satisfaction_v2 ~ Gender+CustomerType+Age+TypeofTravel+Class+FlightDistance+Seatcomfort+Foodanddrink+Gatelocation+Inflightwifiservice+Inflightentertainment+Onlinesupport+EaseofOnlinebooking+Legroomservice+Baggagehandling+Checkinservice+Cleanliness+Onlineboarding, data=trainset.rf, mtry = 4,importance=T)
+
+sf.rf&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+##  randomForest(formula = satisfaction_v2 ~ Gender + CustomerType +      Age + TypeofTravel + Class + FlightDistance + Seatcomfort +      Foodanddrink + Gatelocation + Inflightwifiservice + Inflightentertainment +      Onlinesupport + EaseofOnlinebooking + Legroomservice + Baggagehandling +      Checkinservice + Cleanliness + Onlineboarding, data = trainset.rf,      mtry = 4, importance = T) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 4
+## 
+##         OOB estimate of  error rate: 4.39%
+## Confusion matrix:
+##                         neutral or dissatisfied satisfied class.error
+## neutral or dissatisfied                   39466      1631  0.03968660
+## satisfied                                  2365     47532  0.04739764&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;importance(sf.rf)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                       neutral or dissatisfied satisfied MeanDecreaseAccuracy
+## Gender                               93.80317  86.07941            114.76980
+## CustomerType                         90.62215  97.23443            117.30727
+## Age                                  65.84208  53.35518             77.86496
+## TypeofTravel                         81.97683  62.62632             94.94336
+## Class                                52.90785  49.97860             57.42750
+## FlightDistance                       44.82861  54.04602             56.86789
+## Seatcomfort                         163.62877  70.20255            121.94201
+## Foodanddrink                         54.37578  54.90897             67.74233
+## Gatelocation                         64.86997  42.31150             45.43890
+## Inflightwifiservice                  29.54222  45.56537             42.59609
+## Inflightentertainment                86.65404  95.08923            102.27934
+## Onlinesupport                        98.93648  67.07348            108.63742
+## EaseofOnlinebooking                  50.41784  64.89189             70.74521
+## Legroomservice                       58.65977  57.94695             72.16473
+## Baggagehandling                      87.30701  55.29611             93.06569
+## Checkinservice                      129.61726  66.43225            138.20110
+## Cleanliness                          84.03315  43.18748             80.70073
+## Onlineboarding                       45.57739  50.95123             55.29616
+##                       MeanDecreaseGini
+## Gender                       1530.6700
+## CustomerType                 2093.1213
+## Age                          1649.5433
+## TypeofTravel                 1414.5922
+## Class                        1693.8840
+## FlightDistance               1927.4891
+## Seatcomfort                  6118.6172
+## Foodanddrink                 1903.5499
+## Gatelocation                 1144.2234
+## Inflightwifiservice           832.5739
+## Inflightentertainment        9564.7296
+## Onlinesupport                3157.4321
+## EaseofOnlinebooking          3629.4027
+## Legroomservice               2127.8369
+## Baggagehandling              1364.9374
+## Checkinservice               1286.3479
+## Cleanliness                  1363.4651
+## Onlineboarding               1628.1457&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predictions = predict(sf.rf, testset.rf)
+table(predictions, testset.rf$satisfaction_v2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                          
+## predictions               neutral or dissatisfied satisfied
+##   neutral or dissatisfied                   16998       991
+##   satisfied                                   698     20199&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;confusionMatrix(table(predictions, testset.rf$satisfaction_v2))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Confusion Matrix and Statistics
+## 
+##                          
+## predictions               neutral or dissatisfied satisfied
+##   neutral or dissatisfied                   16998       991
+##   satisfied                                   698     20199
+##                                                  
+##                Accuracy : 0.9566                 
+##                  95% CI : (0.9545, 0.9586)       
+##     No Information Rate : 0.5449                 
+##     P-Value [Acc &amp;gt; NIR] : &amp;lt; 2.2e-16              
+##                                                  
+##                   Kappa : 0.9125                 
+##                                                  
+##  Mcnemar&amp;#39;s Test P-Value : 1.203e-12              
+##                                                  
+##             Sensitivity : 0.9606                 
+##             Specificity : 0.9532                 
+##          Pos Pred Value : 0.9449                 
+##          Neg Pred Value : 0.9666                 
+##              Prevalence : 0.4551                 
+##          Detection Rate : 0.4371                 
+##    Detection Prevalence : 0.4626                 
+##       Balanced Accuracy : 0.9569                 
+##                                                  
+##        &amp;#39;Positive&amp;#39; Class : neutral or dissatisfied
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On top of that, we saw the random forest model, well-known as ensemble learning which harnesses ‘bagging’ to fix the errors in other decision trees, shows the best proficiency in predicting the overall customer satisfaction variable. Moreover, we can sophisticate this model with changing parameters in the randomforest() function, such as ntree and mtry. The only thing concerned with this model is computing time, though this doesn’t make differences in proficiency of this model.
+We ran for loop to calculate the best parameters in random forest. And with ntree of 500 and mtry of 5, this model showed the highest accuracy of .9572 in prediction.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ntree = c(400, 500, 600)
+mtry = c(3:5)
+param = data.frame(n = ntree, m = mtry)
+
+for (i in param$n){
+  cat(&amp;#39;ntree=&amp;#39;, i, &amp;#39;\n&amp;#39;)
+  for (j in param$m){
+    cat(&amp;#39;mtry&amp;#39;)
+    model_sf = randomForest(satisfaction_v2~Gender+CustomerType+Age+TypeofTravel+Class+FlightDistance+Seatcomfort+Foodanddrink+Gatelocation+Inflightwifiservice+Inflightentertainment+Onlinesupport+EaseofOnlinebooking+Legroomservice+Baggagehandling+Checkinservice+Cleanliness+Onlineboarding, data=trainset.rf, ntree = i, mtry = j,importance=T)
+
+predictions.1 = predict(model_sf, testset.rf)
+table(predictions.1, testset.rf$satisfaction_v2)
+confusionMatrix(table(predictions.1, testset.rf$satisfaction_v2))
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;logistic-regression-model&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;3.2.2. Logistic regression model&lt;/h6&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;##########
+# Logistic regrssion
+##########
+
+sf.lr = sf %&amp;gt;%
+  mutate(satisfaction_v2 = ifelse(satisfaction_v2 == &amp;#39;satisfied&amp;#39;, 1, 0))
+
+trainset.lr = sf.lr[index==1,]
+testset.lr = sf.lr[index==2,]
+
+fit = glm(satisfaction_v2 ~ ., data=trainset.lr, family=binomial)
+summary(fit)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Call:
+## glm(formula = satisfaction_v2 ~ ., family = binomial, data = trainset.lr)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.0167  -0.5796   0.1980   0.5245   3.6593  
+## 
+## Coefficients:
+##                                       Estimate Std. Error z value Pr(&amp;gt;|z|)    
+## (Intercept)                         -6.772e+00  7.780e-02 -87.040  &amp;lt; 2e-16 ***
+## GenderMale                          -9.555e-01  1.955e-02 -48.876  &amp;lt; 2e-16 ***
+## `Customer Type`Loyal Customer        1.979e+00  2.977e-02  66.470  &amp;lt; 2e-16 ***
+## Age                                 -7.613e-03  6.791e-04 -11.210  &amp;lt; 2e-16 ***
+## `Type of Travel`Personal Travel     -7.821e-01  2.787e-02 -28.060  &amp;lt; 2e-16 ***
+## ClassEco                            -7.290e-01  2.529e-02 -28.829  &amp;lt; 2e-16 ***
+## ClassEco Plus                       -8.156e-01  3.894e-02 -20.946  &amp;lt; 2e-16 ***
+## `Flight Distance`                   -1.365e-04  1.017e-05 -13.426  &amp;lt; 2e-16 ***
+## `Seat comfort`                       2.960e-01  1.097e-02  26.969  &amp;lt; 2e-16 ***
+## `Departure/Arrival time convenient` -2.045e-01  8.084e-03 -25.303  &amp;lt; 2e-16 ***
+## `Food and drink`                    -2.157e-01  1.111e-02 -19.416  &amp;lt; 2e-16 ***
+## `Gate location`                      1.099e-01  9.097e-03  12.084  &amp;lt; 2e-16 ***
+## `Inflight wifi service`             -7.535e-02  1.053e-02  -7.157 8.26e-13 ***
+## `Inflight entertainment`             6.836e-01  9.856e-03  69.354  &amp;lt; 2e-16 ***
+## `Online support`                     8.657e-02  1.072e-02   8.078 6.58e-16 ***
+## `Ease of Online booking`             2.244e-01  1.381e-02  16.250  &amp;lt; 2e-16 ***
+## `On-board service`                   3.031e-01  9.840e-03  30.808  &amp;lt; 2e-16 ***
+## `Leg room service`                   2.167e-01  8.344e-03  25.970  &amp;lt; 2e-16 ***
+## `Baggage handling`                   9.123e-02  1.108e-02   8.234  &amp;lt; 2e-16 ***
+## `Checkin service`                    2.955e-01  8.245e-03  35.843  &amp;lt; 2e-16 ***
+## Cleanliness                          1.045e-01  1.147e-02   9.118  &amp;lt; 2e-16 ***
+## `Online boarding`                    1.691e-01  1.177e-02  14.368  &amp;lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 125292  on 90993  degrees of freedom
+## Residual deviance:  70489  on 90972  degrees of freedom
+## AIC: 70533
+## 
+## Number of Fisher Scoring iterations: 5&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pred = predict(fit, testset, type=&amp;quot;response&amp;quot;)
+predictions = (pred &amp;lt;.5)
+
+table(predictions, testset.lr$satisfaction_v2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            
+## predictions     0     1
+##       FALSE  3272 18002
+##       TRUE  14424  3188&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;testset.lr$manual_l=ifelse(testset.lr$satisfaction_v2==1, FALSE, TRUE)
+table(predictions, testset.lr$manual_l)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            
+## predictions FALSE  TRUE
+##       FALSE 18002  3272
+##       TRUE   3188 14424&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;confusionMatrix(table(predictions, testset.lr$manual_l))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Confusion Matrix and Statistics
+## 
+##            
+## predictions FALSE  TRUE
+##       FALSE 18002  3272
+##       TRUE   3188 14424
+##                                           
+##                Accuracy : 0.8339          
+##                  95% CI : (0.8301, 0.8376)
+##     No Information Rate : 0.5449          
+##     P-Value [Acc &amp;gt; NIR] : &amp;lt;2e-16          
+##                                           
+##                   Kappa : 0.6649          
+##                                           
+##  Mcnemar&amp;#39;s Test P-Value : 0.3018          
+##                                           
+##             Sensitivity : 0.8496          
+##             Specificity : 0.8151          
+##          Pos Pred Value : 0.8462          
+##          Neg Pred Value : 0.8190          
+##              Prevalence : 0.5449          
+##          Detection Rate : 0.4629          
+##    Detection Prevalence : 0.5471          
+##       Balanced Accuracy : 0.8323          
+##                                           
+##        &amp;#39;Positive&amp;#39; Class : FALSE           
+## &lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# find the best cut-off
+sf.roc=roc(testset.lr$manual_l, pred)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Setting levels: control = FALSE, case = TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Setting direction: controls &amp;gt; cases&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(sf.roc)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;coords(sf.roc, &amp;quot;best&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in coords.roc(sf.roc, &amp;quot;best&amp;quot;): The &amp;#39;transpose&amp;#39; argument to FALSE
+## by default since pROC 1.16. Set transpose = TRUE explicitly to revert to
+## the previous behavior, or transpose = TRUE to silence this warning. Type
+## help(coords_transpose) for additional information.&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##   threshold specificity sensitivity
+## 1 0.6104963    0.800991   0.8798599&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And, here is the threshold graph for the best cut-off in logistic regression model. We also ran for logistic regression model, which is good to set the best cut-off for sensitivity/specificity. For running, we should pre-process the ‘satisfaction_v2’ with making it as a numeric variable, because this model assumes a binomial family in Y value.
+The best cut-off in both sensitivity and specificity is 0.610, and the best result is 0.8/0.88 for each. Plus, with that, we should notice these are in fact reversed estimates, because we should assume that the actual positive value is ‘neutral/dissatisfied’, which should be more accurately predicted to improve customer services of US airlines.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;*References&lt;/h6&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.cnbc.com/2019/05/28/consumer-satisfaction-soars-to-record-high-in-airline-travel-survey.html&#34;&gt;Consumer satisfaction in the skies soars to record high in annual airline travel survey (2019.05.29)&lt;/a&gt;
+&lt;a href=&#34;https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html&#34;&gt;US airline stocks tumble after Buffett sells stakes (2020.05.04)&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+       <item>
+         <title>Presidential excitable speech analysis (2)</title>
+         <link>/posts/presidential-excitable-speech-analysis_2/</link>
+         <pubDate>Sat, 13 Jun 2020 00:00:00 +0000</pubDate>
+         
+         <guid>/posts/presidential-excitable-speech-analysis_2/</guid>
+         <description>
+
+
+&lt;blockquote&gt;
+&lt;p&gt;본 프로젝트는 2회에 걸쳐 게시되었습니다. 첫 번째 게시물은 자료 수집과 전처리 및 산출식 개발 등에 초점을 맞추고, 두 번째 게시물은 본격적인 상관분석, 시각화와 주관적 분석을 다루고 있습니다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr /&gt;
+&lt;p&gt;목차&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;도입
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;간단한 소개&lt;/li&gt;
+&lt;li&gt;지난 게시물에서는&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;상관분석 및 시각화
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;상관분석&lt;/li&gt;
+&lt;li&gt;시각화
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;단어별 시각화&lt;/li&gt;
+&lt;li&gt;부정/긍정평가 시각화&lt;/li&gt;
+&lt;li&gt;급진/중도평가 시각화&lt;/li&gt;
+&lt;li&gt;상관관계 추이 시각화&lt;/li&gt;
+&lt;li&gt;대시보드화&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;주관적 분석&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div id=&#34;간단한-소개&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;간단한 소개&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt; 2018.2 ~ 문재인 현 대통령의 국정 지지도&lt;/strong&gt;와 네이버/다음 메인 시사 뉴스 댓글 중 &lt;strong&gt;‘문재앙’ 키워드를 포함한 댓글의 좋아요/싫어요 수치&lt;/strong&gt;를 구한다. 이를 상관 분석을 통해 비교하고자 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;지난-게시물에서는&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;지난 게시물에서는&lt;/h2&gt;
+&lt;p&gt;지난번 게시물에서는 N2H4와 xml2, rvest 등의 패키지를 이용하여 네이버 랭킹 배너 조회수 기준 top 30개 기사에 달린 댓글 수와 좋아요/싫어요 갯수를 크롤링하고, 크롤링한 댓글 관련 데이터와 여론조사 기관의 국정 지지도 데이터를 상관분석할 수 있도록 전처리하는 작업을 서술했다. 이번에는 전처리하고 scatterplot으로 살펴본 데이터를 상관분석하고 시각화하여 이를 바탕으로 나름의 주관적 분석을 해볼까한다.&lt;/p&gt;
+&lt;p&gt;분석에 활용할 댓글 크롤링 데이터는 다음과 같다. 비하 단어 5개(순서대로 ‘문재앙’, ‘문죄인’, ‘중국몽’, ‘문슬람’, ‘대깨문’)의 댓글 수(num_), 좋아요 수(like_), 싫어요 수(dislike_)가 순서대로 수집된 된 것을 확인할 수 있다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Summary&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 120 x 19
+##    like_all dislike_all num_all like_1 dislike_1 num_1 like_2 dislike_2 num_2
+##       &amp;lt;dbl&amp;gt;       &amp;lt;dbl&amp;gt;   &amp;lt;dbl&amp;gt;  &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;  &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+##  1  3205941      907208  150062  88552     41136  3065  33273      9399   803
+##  2  7317042     1745848  318100 156497     66183  7673  25083     10517  1675
+##  3  6700141     1290108  292988 179743     48236  6897  42685     10651  1683
+##  4  8016580     1985358  346844  88526     36852  6563  20147      9517  1732
+##  5  6937595     1204274  335147  42375     16495  3886  11595      4082  1027
+##  6  5430342     1108540  279648  41482     22111  3455   7675      3718   868
+##  7  4309517      885848  244927  27128     11087  3089   8296      3695   908
+##  8  5387709     1069080  274960  67028     22238  4785  13658      4743  1209
+##  9  4920489     1035519  267698  34338     16508  3727  11035      5376  1120
+## 10  7245289      955180  361099  34102     16273  4069  14388      4761  1083
+## # ... with 110 more rows, and 10 more variables: like_3 &amp;lt;dbl&amp;gt;, dislike_3 &amp;lt;dbl&amp;gt;,
+## #   num_3 &amp;lt;dbl&amp;gt;, like_4 &amp;lt;dbl&amp;gt;, dislike_4 &amp;lt;dbl&amp;gt;, num_4 &amp;lt;dbl&amp;gt;, like_5 &amp;lt;dbl&amp;gt;,
+## #   dislike_5 &amp;lt;dbl&amp;gt;, num_5 &amp;lt;dbl&amp;gt;, week &amp;lt;dttm&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 지난 게시물 마지막에 보았던 scatterplot을 다시 보는 것으로 시작하자.&lt;/p&gt;
+&lt;div id=&#34;option-2는-좋아요-수-좋아요-싫어요-수&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 2는 좋아요 수 / (좋아요 + 싫어요 수)&lt;/h5&gt;
+&lt;/div&gt;
+&lt;div id=&#34;option-3는-좋아요-싫어요-수-좋아요-수log단어-포함-댓글-수전체-댓글-수&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 3는 {(좋아요 + 싫어요 수) / 좋아요 수}*log(단어 포함 댓글 수/전체 댓글 수)&lt;/h5&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## Option 2
+par(mfrow = c(2, 2))
+plot(Summary.df$disaster, Summary.df.2$잘못한다, main = &amp;quot;문재앙 지수&amp;quot;)
+plot(Summary.df$sinner, Summary.df.2$잘못한다, main = &amp;quot;문죄인 지수&amp;quot;)
+plot(Summary.df$islam, Summary.df.2$잘못한다, main = &amp;quot;문슬람 지수&amp;quot;)
+plot(Summary.df$head, Summary.df.2$잘못한다, main = &amp;quot;대깨문 지수&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## Option 3
+par(mfrow = c(2, 2))
+plot(Summary.df.2$disaster, Summary.df.2$잘못한다, main = &amp;quot;문재앙 지수&amp;quot;)
+plot(Summary.df.2$sinner, Summary.df.2$잘못한다, main = &amp;quot;문죄인 지수&amp;quot;)
+plot(Summary.df.2$islam, Summary.df.2$잘못한다, main = &amp;quot;문슬람 지수&amp;quot;)
+plot(Summary.df.2$head, Summary.df.2$잘못한다, main = &amp;quot;대깨문 지수&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;어떤 지수를 사용할지는 우리 마음이지만, 두 개의 지수에 따른 데이터 분포는 약간 다른 형태를 보여준다. 추후 시각화된 그래프를 살펴보면 어떤 특성에 따라 다르게 나타나는지 확인할 수 있으며 이는 개별 비하 단어 사용의 특성(맥락, 어감, 비하 대상) 등의 차이를 암시한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;상관분석&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;상관분석&lt;/h2&gt;
+&lt;p&gt;그렇다면 5개 단어와 여론조사 평가항목(한국갤럽 및 리얼미터) 11개 및 정치성향별(보수/진보/중도) 평가항목 21개를 합한 총 32개의 평가항목 간의 피어슨 상관계수는 어떻게 나타났을까?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# option 2
+mySumm %&amp;gt;% arrange(p.value) %&amp;gt;%
+  select(word, eval, estimate, everything(), -method) %&amp;gt;%
+  filter(p.value&amp;lt;.05) %&amp;gt;% print(n = 30)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 108 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;
+##  1 disa~ 잘한다~   -0.668     -9.59 2.54e-16       114   -0.758    -0.553
+##  2 disa~ 잘못한다~    0.665      9.50 4.02e-16       114    0.549     0.756
+##  3 disa~ 중도잘한~   -0.669     -9.53 4.03e-16       112   -0.760    -0.553
+##  4 disa~ 매우잘한~   -0.664     -9.48 4.48e-16       114   -0.755    -0.548
+##  5 disa~ 중도잘못~    0.667      9.48 5.20e-16       112    0.551     0.758
+##  6 disa~ 보수매우~    0.660      9.30 1.34e-15       112    0.542     0.753
+##  7 disa~ 보수잘못~    0.659      9.27 1.61e-15       112    0.540     0.752
+##  8 disa~ 중도매우~   -0.658     -9.24 1.87e-15       112   -0.751    -0.539
+##  9 disa~ 보수매우~   -0.653     -9.13 3.32e-15       112   -0.747    -0.533
+## 10 disa~ g잘하고~   -0.661     -9.12 5.07e-15       107   -0.755    -0.540
+## 11 disa~ g잘못하~    0.661      9.11 5.21e-15       107    0.540     0.755
+## 12 disa~ 매우잘못~    0.645      9.00 5.84e-15       114    0.524     0.740
+## 13 disa~ 보수잘한~   -0.648     -9.01 6.34e-15       112   -0.744    -0.527
+## 14 disa~ 중도매우~    0.634      8.67 3.82e-14       112    0.509     0.732
+## 15 disa~ 진보잘못~    0.627      8.53 8.11e-14       112    0.501     0.727
+## 16 sinn~ 매우잘한~   -0.618     -8.40 1.39e-13       114   -0.720    -0.492
+## 17 disa~ 진보잘한~   -0.620     -8.36 1.90e-13       112   -0.722    -0.492
+## 18 sinn~ 중도매우~   -0.615     -8.25 3.51e-13       112   -0.717    -0.486
+## 19 sinn~ 진보잘못~    0.610      8.15 5.77e-13       112    0.480     0.714
+## 20 sinn~ 잘한다~   -0.604     -8.10 6.73e-13       114   -0.709    -0.474
+## 21 disa~ 보수모름~   -0.603     -8.00 1.27e-12       112   -0.708    -0.471
+## 22 sinn~ 잘못한다~    0.595      7.90 1.93e-12       114    0.463     0.701
+## 23 sinn~ 진보잘한~   -0.597     -7.88 2.30e-12       112   -0.704    -0.464
+## 24 disa~ 진보매우~   -0.595     -7.84 2.84e-12       112   -0.702    -0.462
+## 25 disa~ 진보매우~    0.595      7.83 3.01e-12       112    0.461     0.702
+## 26 sinn~ 중도잘한~   -0.593     -7.79 3.68e-12       112   -0.700    -0.459
+## 27 sinn~ 중도잘못~    0.588      7.69 6.27e-12       112    0.453     0.696
+## 28 sinn~ 진보매우~   -0.580     -7.54 1.30e-11       112   -0.691    -0.444
+## 29 sinn~ 보수잘못~    0.579      7.52 1.47e-11       112    0.442     0.690
+## 30 sinn~ 보수잘한~   -0.579     -7.52 1.49e-11       112   -0.690    -0.442
+## # ... with 78 more rows, and 1 more variable: alternative &amp;lt;chr&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# option 3
+mySumm.2 %&amp;gt;% arrange(p.value) %&amp;gt;%
+  select(word, eval, estimate, everything(), -method) %&amp;gt;%
+  filter(p.value&amp;lt;.05) %&amp;gt;% print(n = 30)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 121 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;
+##  1 head  중도잘못~    0.779     13.1  2.05e-24       112    0.694     0.842
+##  2 head  중도잘한~   -0.772    -12.9  8.41e-24       112   -0.837    -0.686
+##  3 head  중도매우~    0.765     12.6  3.95e-23       112    0.676     0.832
+##  4 head  보수잘못~    0.762     12.5  6.59e-23       112    0.673     0.830
+##  5 head  보수매우~    0.761     12.4  8.01e-23       112    0.672     0.829
+##  6 head  매우잘못~    0.757     12.4  8.99e-23       114    0.666     0.825
+##  7 head  잘못한다~    0.756     12.3  9.72e-23       114    0.666     0.825
+##  8 head  보수잘한~   -0.752    -12.1  5.60e-22       112   -0.822    -0.659
+##  9 head  잘한다~   -0.737    -11.6  3.91e-21       114   -0.811    -0.641
+## 10 head  중도매우~   -0.722    -11.0  1.33e-19       112   -0.799    -0.620
+## 11 head  g잘못하~    0.731     11.1  1.73e-19       107    0.630     0.808
+## 12 head  보수잘하~   -0.713    -10.8  5.34e-19       112   -0.793    -0.609
+## 13 head  보수매우~   -0.706    -10.5  1.80e-18       112   -0.788    -0.600
+## 14 head  g잘하고~   -0.716    -10.6  2.02e-18       107   -0.797    -0.610
+## 15 head  진보매우~    0.691     10.1  1.84e-17       112    0.581     0.776
+## 16 head  보수모름~   -0.688    -10.0  2.57e-17       112   -0.774    -0.578
+## 17 disa~ 진보매우~   -0.682     -9.88 6.38e-17       112   -0.770    -0.570
+## 18 head  매우잘한~   -0.674     -9.75 1.06e-16       114   -0.763    -0.561
+## 19 disa~ 매우잘한~   -0.669     -9.60 2.38e-16       114   -0.758    -0.554
+## 20 disa~ 중도매우~   -0.635     -8.70 3.26e-14       112   -0.733    -0.511
+## 21 head  진보잘못~    0.633      8.65 4.18e-14       112    0.508     0.732
+## 22 sinn~ 매우잘한~   -0.627     -8.60 5.01e-14       114   -0.726    -0.502
+## 23 disa~ 진보잘하~    0.631      8.62 5.05e-14       112    0.506     0.730
+## 24 sinn~ 진보잘못~    0.629      8.55 7.08e-14       112    0.503     0.728
+## 25 disa~ 진보잘못~    0.628      8.53 7.75e-14       112    0.502     0.728
+## 26 disa~ 진보잘한~   -0.625     -8.47 1.07e-13       112   -0.725    -0.498
+## 27 sinn~ 진보잘한~   -0.625     -8.46 1.13e-13       112   -0.725    -0.498
+## 28 sinn~ 진보매우~   -0.624     -8.46 1.17e-13       112   -0.725    -0.497
+## 29 disa~ 진보잘못~    0.614      8.23 3.81e-13       112    0.485     0.717
+## 30 disa~ 보수매우~   -0.611     -8.17 5.11e-13       112   -0.715    -0.481
+## # ... with 91 more rows, and 1 more variable: alternative &amp;lt;chr&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;상관계수가 높은 상위 30개 항목을 보았을 때 상관도가 높은 단어가 지수별로 상이하게 나옴을 알 수 있다. 가령 댓글 좋아요와 싫어요를 단순 비교한 Option 2의 경우 ‘문재앙’ 댓글이 높은 상관도를 보이는 반면, 전체 댓글 수 대비 비하 단어 포함 댓글 수를 로그 변환 후 반영하는 Option 3의 경우 ‘대깨문’ 댓글이 높은 상관도를 보이고 있다.&lt;/p&gt;
+&lt;p&gt;이제 ggplot2 패키지를 통해 2개 지수의 상관계수를 단어별로 시각화하여 살펴보도록 하자.&lt;/p&gt;
+&lt;div id=&#34;단어별-시각화&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;단어별 시각화&lt;/h3&gt;
+&lt;div id=&#34;option-2&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 2&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/cars-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;option-3&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 3&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Option 2에서는 ‘중국몽’, Option 3에서는 ’문슬람’과 댓글 지수가 거의 무관한 것으로 추정된다. 따라서 각 수식의 이후 시각화에서 해당 단어는 제외했다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;부정긍정평가-시각화&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;부정/긍정평가 시각화&lt;/h3&gt;
+&lt;p&gt;국정수행 부정평가와 긍정평가 두 수치와 Option 2,3 식의 상관관계를 시각화해보자. 여론조사 항목에서 ’잘못’이 들어가면 부정평가 항목이며 긍정평가 항목은 |을 이용하여 일일이 필터링 전처리를 해준다.
+비하 단어와 여론조사의 상관도를 살펴보고 있는만큼 상식적으로라면 부정평가와 더 많은 호응을 할 것이다. 즉, 시민들은 대통령에 대한 부정적 평가와 비하 단어 사이에서 더 긴밀한 연관을 보이고 있을 것이다. 그런데 과연 그럴까?&lt;/p&gt;
+&lt;div id=&#34;option-2-1&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 2&lt;/h5&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mySumm %&amp;gt;%
+  filter(str_detect(eval, &amp;quot;잘못&amp;quot;)) %&amp;gt;%
+  mutate(colors = ifelse(p.value&amp;lt;0.05, &amp;#39;valid&amp;#39;, &amp;#39;invalid&amp;#39;)) %&amp;gt;%
+  filter(!str_detect(word, &amp;quot;china&amp;quot;)) %&amp;gt;%
+  filter(!str_detect(eval, &amp;quot;보수&amp;quot;) &amp;amp; !str_detect(eval, &amp;quot;진보&amp;quot;) &amp;amp; !str_detect(eval, &amp;quot;중도&amp;quot;)) %&amp;gt;%
+  ggplot(aes(x = word, y = estimate, fill = colors)) +
+  ggtitle(&amp;quot;비하 단어별 부정평가 상관계수(A)&amp;quot;)+
+  geom_bar(stat = &amp;quot;identity&amp;quot;) +
+  geom_text(aes(label=round(estimate,4), vjust=-0.2), size = 3.5) +
+  xlab(&amp;quot;비하 단어&amp;quot;)+
+  ylab(&amp;quot;상관계수&amp;quot;)+
+  scale_x_discrete(labels = c(&amp;quot;문재앙&amp;quot;, &amp;quot;대깨문&amp;quot;, &amp;quot;문슬람&amp;quot;, &amp;quot;문죄인&amp;quot;))+
+  scale_fill_discrete(name = &amp;quot;p값(&amp;lt;.05) 기준 유의도&amp;quot;, labels = c(&amp;quot;유의하지 않다&amp;quot;,&amp;quot;유의하다&amp;quot;))+
+  theme_bw()+
+  facet_wrap(~eval)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;
+&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;option-3-1&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 3&lt;/h5&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mySumm.2 %&amp;gt;%
+  filter(str_detect(eval, &amp;quot;잘못&amp;quot;)) %&amp;gt;%
+  filter(!str_detect(word, &amp;quot;islam&amp;quot;)) %&amp;gt;%
+  mutate(colors = ifelse(p.value&amp;lt;0.05, &amp;#39;valid&amp;#39;, &amp;#39;invalid&amp;#39;)) %&amp;gt;%
+  filter(!str_detect(eval, &amp;quot;보수&amp;quot;) &amp;amp; !str_detect(eval, &amp;quot;진보&amp;quot;) &amp;amp; !str_detect(eval, &amp;quot;중도&amp;quot;)) %&amp;gt;%
+  ggplot(aes(x = word, y = estimate, fill = colors)) +
+  ggtitle(&amp;quot;비하 단어별 부정평가 상관계수(B)&amp;quot;)+
+  geom_bar(stat = &amp;quot;identity&amp;quot;) +
+  geom_text(aes(label=round(estimate,4), vjust=-0.2), size = 3.5) +
+  xlab(&amp;quot;비하 단어&amp;quot;)+
+  ylab(&amp;quot;상관계수&amp;quot;)+
+  scale_x_discrete(labels = c(&amp;quot;중국몽&amp;quot;, &amp;quot;문재앙&amp;quot;, &amp;quot;대깨문&amp;quot;, &amp;quot;문죄인&amp;quot;))+
+  scale_fill_brewer(name = &amp;quot;p값(&amp;lt;.05) 기준 유의도&amp;quot;, labels = c(&amp;quot;유의하다&amp;quot;), palette = &amp;quot;Set2&amp;quot;)+
+  theme_bw()+
+  facet_wrap(~eval)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;
+&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;상식에 기반한 추측과는 달리, 긍정평가 부정평가 모두 비슷한 상관계수를 보이고 있다. 댓글 좋아요 비율만을 반영하는 Option 2는 주로 ‘문재앙’, ‘문죄인’ 포함 댓글과, 로그값으로 변환된 작성 댓글 수를 반영한 Option 3의 경우 ‘대깨문’ 포함 댓글이 높은 상관도를 보이고 있다. 또한 긍/부정평가 모두 ‘잘하는 편’, ‘잘못하는 편’ 등 중도평가에서 다소 애매한 수치를 보이고 있는 점 역시 흥미롭다. 중도평가를 내리는 이들은 비하 단어 포함 댓글에 상대적으로 덜 호응하고 있다고 볼 수 있는 것이다.&lt;/p&gt;
+&lt;p&gt;급진/중도평가를 나누어 시각화하여 이 부분을 좀 더 자세히 들여다보자. 어떤 현상을 포착할 수 있을까? 그리고 이번에는 세부 정치성향별 여론조사 항목도 함께 넣어보자. 보수 성향 응답자와 진보 성향 응답자 사이에는 어떻게 눈에 띄는 차이가 발견될까?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;급진중도평가-시각화&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;급진/중도평가 시각화&lt;/h3&gt;
+&lt;div id=&#34;option-2-2&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 2&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-11-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;option-3-2&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;option 3&lt;/h5&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-12-2.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;우선 급진평가에서는 Option 2와 Option 3에서 모두 뚜렷하고 일관된 결과를 보이고 있다. 즉 여론조사 항목과 직접 계산한 비하 댓글 지수가 나름대로 적절히 호응하고 있으며 이는 대통령 국정수행에 대해 다소 급진적인 의견을 가진 이들이 비하 댓글이라는 proxy를 통해 적절히 대표되고 있음으로 해석할 수 있을 것이다. 그런데 중도평가 항목에서는 그렇지 않다. 눈에 띄는 현상으로는, 보수 성향 응답자와 진보 성향 응답자의 치우침이 있다.&lt;/p&gt;
+&lt;p&gt;마지막으로, 상관관계 추이를 살펴보자. 조사기간이 120주였던 만큼, 이를 4부분으로 나누어도 상관도를 파악하기 적절한 표본 수를 보장받을 수 있을 거라고 판단했다. 우선 앞 2부분, 즉 2018.2~2019.4는 대통령 지지도가 꾸준히 하락한 시점이며 뒷 2부분 2019.4~2020.5는 레임덕 현상으로 지지율이 지지부진하며 코로나 사태로 국정 변동이 심하던 시점과 맞물린다. 따라서 시간이 지날수록 비하 단어와 국정평가의 상관도는 상대적으로 감소해왔을 것이라고 상식적인 추측을 해 볼 수 있다.&lt;/p&gt;
+&lt;p&gt;과연 그럴까?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;상관관계-추이-시각화&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;상관관계 추이 시각화&lt;/h3&gt;
+&lt;p&gt;상관관계 추이를 살펴보기 위해 다음과 같은 for문 코드를 작성한다. 120주를 4번의 구간으로 분할한 후 각 구간별로 여론조사 항목과 비하 단어 지수의 상관도 테스트를 거칠 것이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myChange = tibble()
+for (k in 1:4){
+  for (i in colnames(Summary.df[1:5])){
+    for (j in colnames(Summary.df[24:34])){
+      formula = as.formula(str_c(&amp;quot;~&amp;quot;,i,&amp;quot;[&amp;quot;,as.character(1+(k-1)*30),&amp;quot;:&amp;quot;,as.character(30*k),&amp;quot;]+&amp;quot;,j,&amp;quot;[&amp;quot;,as.character(1+(k-1)*30),&amp;quot;:&amp;quot;,as.character(30*k),&amp;quot;]&amp;quot;))
+      myCorr = cor.test(formula, data = Summary.df) %&amp;gt;% tidy() %&amp;gt;% 
+        select(estimate, p.value, conf.low, conf.high)
+      myCorr$word = i
+      myCorr$eval = j
+      myCorr$session = k
+      myChange = bind_rows(myCorr, myChange)
+  }
+}
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이하 그래프 별로 코드가 거의 비슷하므로 ggplot 코드 하나만을 보자면 다음과 같다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;myChange %&amp;gt;%
+  filter(eval == &amp;quot;잘한다&amp;quot; | eval == &amp;quot;잘하는편&amp;quot; | eval == &amp;quot;매우잘한다&amp;quot; | eval == &amp;quot;g잘하고있다&amp;quot;) %&amp;gt;%
+  mutate(colors = ifelse(p.value&amp;lt;0.05, &amp;#39;valid&amp;#39;, &amp;#39;invalid&amp;#39;)) %&amp;gt;%
+  ggplot(aes(x = session, y = estimate)) +
+  ggtitle(&amp;quot;조사기간별 상관계수 추이(A)&amp;quot;)+
+  geom_bar(aes(fill = word), stat= &amp;quot;identity&amp;quot;, position = &amp;quot;dodge&amp;quot;) +
+  xlab(&amp;quot;조사기간\n(4분할)&amp;quot;)+
+  ylab(&amp;quot;상관계수&amp;quot;)+
+  scale_x_continuous(breaks = c(1,2,3,4), labels = c(&amp;quot;&amp;#39;18.02~\n&amp;#39;18.08&amp;quot;,&amp;quot;&amp;#39;18.09~\n&amp;#39;19.03&amp;quot;,&amp;quot;&amp;#39;19.04~\n&amp;#39;19.10&amp;quot;,&amp;quot;&amp;#39;19.11~\n&amp;#39;20.05&amp;quot;))+
+  scale_fill_discrete(name = &amp;quot;word&amp;quot;, labels = c(&amp;quot;중국몽&amp;quot;, &amp;quot;문재앙&amp;quot;, &amp;quot;대깨문&amp;quot;, &amp;quot;문슬람&amp;quot;, &amp;quot;문죄인&amp;quot;))+
+  theme(axis.text = element_text(size = 8))+
+  theme_bw()+
+  facet_wrap(~eval)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;672&#34; /&gt;
+&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-15-2.png&#34; width=&#34;672&#34; /&gt;&lt;img src=&#34;/posts/2020-06-13-presidential-excitable-speech-analysis-2_files/figure-html/unnamed-chunk-15-3.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Option 2와 3에서 조금씩, 그리고 비하 단어별로 다소 난잡한 차이는 보이지만, 대체로 구간이 지날수록 상관도가 조금씩 줄어들며, 특히 중도 평가 항목(“잘하는편”, “잘못하는편”)에서는 상관도가 거의 없다고 볼 수도 있겠다. &lt;strong&gt;즉 레임덕 기간에 대통령에 대해 중도평가를 내리는 이들은 대체로 대통령에 대해 큰 기대나 실망이 없기에 비하 단어에 굳이 반응하지 않고 있는 것으로 볼 수 있겠다.&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;주관적-분석&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;주관적 분석&lt;/h3&gt;
+&lt;p&gt;이번 상관도 분석에서 개인적으로 가장 흥미로웠고 확실히 말할 수 있는 지점은, ‘중국몽’과 ’문슬람’과 같이 특정 국가나 종교를 비하하는 맥락을 함유한 단어의 사용이나 여론과의 호응이 저조했다는 점이다. 대통령에게 책임을 귀인하는 듯한 ’문재앙’ ‘문죄인’ 등의 비하 단어나 심지어 대통령 지지 집단 비하 단어인 ‘대깨문’ 보다 여론과의 호응(상관도)가 낮았다는 사실에서 우리는 이러한 단어의 사용이 특히 정치적인 레토릭으로 다분히 활용되고 있다는 인상을 받는다.&lt;/p&gt;
+&lt;p&gt;물론 해석은 모두 다를 것이다.&lt;/p&gt;
+&lt;p&gt;&lt;mark&gt;끝&lt;/mark&gt;&lt;/p&gt;
+&lt;style&gt;
+body {
+  font-family: NanumGothic;
+  fontsize = 8px
+}
+&lt;/style&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+       <item>
+         <title>Presidential excitable speech analysis (1)</title>
+         <link>/posts/presidential-excitable-speech-analysis_1/</link>
+         <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
+         
+         <guid>/posts/presidential-excitable-speech-analysis_1/</guid>
+         <description>
+
+
+&lt;blockquote&gt;
+&lt;p&gt;본 프로젝트는 2회에 걸쳐 게시되었습니다. 첫 번째 게시물은 자료 수집과 전처리 및 산출식 개발 등에 초점을 맞추고, 두 번째 게시물은 본격적인 상관분석, 시각화와 주관적 분석을 다루고 있습니다.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr /&gt;
+&lt;p&gt;목차&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;도입
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;간단한 소개&lt;/li&gt;
+&lt;li&gt;국정 지지도 자료 수집&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;문재앙 지수 만들기
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;댓글 크롤링
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;네이버&lt;/li&gt;
+&lt;li&gt;다음&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;국정 지지도와 초벌 상관 분석&lt;/li&gt;
+&lt;li&gt;인사이트 파악 및 산출식 개발&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div id=&#34;간단한-소개&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;간단한 소개&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt; 2018.2 ~ 문재인 현 대통령의 국정 지지도&lt;/strong&gt;와 네이버/다음 메인 시사 뉴스 댓글 중 &lt;strong&gt;‘문재앙’ 키워드를 포함한 댓글의 좋아요/싫어요 수치&lt;/strong&gt;를 구한다. 이를 상관 분석을 통해 비교하고자 한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;국정-지지도-자료-수집&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;국정 지지도 자료 수집&lt;/h2&gt;
+&lt;p&gt;현 대통령의 국정 지지도 수치는 국내 여론조사 기관 ‘한국갤럽’과 ’리얼미터’의 주간 집계자료를 이용하되, 위키백과 항목에 주간별로 정리된 테이블을 스프레드시트에 옮겨 R로 전처리 후 사용한다. 보다 세부적인 대통령 국정평가 항목, 즉 ’긍정평가’ ‘부정평가’ 수치는 각 여론조사 기관 홈페이지에 게재되는 주간 동향 보도자료 내 수치를 스프레드시트로 정리한 후 사용한다.
+cf. 구글 스프레드시트를 통해 크롤링하는 방법도 고려했지만, 여론조사 홈페이지 URL 링크의 불규칙성, 한글 주소의 인코딩 문제, PDF 파일 크롤링의 어려움 등을 감안해 주간 자료를 직접 table로 정리하는 것이 효율적이라고 판단했다.&lt;/p&gt;
+&lt;p&gt;국정 지지도 자료를 구하는 데에는 크게 2가지 경로가 있다. 하나는 &lt;a href=&#34;https://ko.wikipedia.org/wiki/%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD%EC%9D%98_%EB%8C%80%ED%86%B5%EB%A0%B9_%EC%A7%80%EC%A7%80%EC%9C%A8&#34;&gt;위키백과 ‘대한민국의 대통령 지지율’ 항목&lt;/a&gt;에서 표로 정리된 리얼미터/한국갤럽 자료를 이용하는 것이고, 다른 하나는 해당 조사기관 홈페이지에 주마다 게시되는 보도자료를 직접 참조하는 것이다. 나는 일차적인 분석을 위해 간편한 위키백과 도표 자료를 이용하고, 일정한 인사이트를 얻은 후 해당 홈페이지에 게시된 보도자료의 더 상세한 수치를 직접 구글스프레드 시트 등으로 정리하여 R로 불러왔다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# 조사기관 보도자료 내 긍정/부정평가 항목 데이터 불러오기 (리얼미터, 한국갤럽)
+
+rlmeter_president = read_xlsx(&amp;quot;poll_president.xlsx&amp;quot;, sheet = 1, range = cell_cols(&amp;quot;A:H&amp;quot;))
+rlmeter_president&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 120 x 8
+##    week                매우잘한다 잘하는편 잘못하는편 매우잘못함 잘한다 잘못한다
+##    &amp;lt;dttm&amp;gt;                   &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;      &amp;lt;dbl&amp;gt;      &amp;lt;dbl&amp;gt;  &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;
+##  1 2018-02-03 00:00:00       41.5     22         13.3       18.8   63.5     32.1
+##  2 2018-02-10 00:00:00       43.8     19.3       12.4       19.1   63.1     31.5
+##  3 2018-02-17 00:00:00       41.7     24         11         17.9   65.7     28.9
+##  4 2018-02-24 00:00:00       42       23.5       12         18.6   65.5     30.6
+##  5 2018-03-03 00:00:00       44.8     21         12.5       15.7   65.8     28.2
+##  6 2018-03-10 00:00:00       49.2     20.4       10.5       13.3   69.6     23.8
+##  7 2018-03-17 00:00:00       49.3     19.8       10.5       16.1   69.1     26.6
+##  8 2018-03-24 00:00:00       48.6     20.9       11.1       14.5   69.5     25.6
+##  9 2018-03-31 00:00:00       46.7     21.4       11.8       13.9   68.1     25.7
+## 10 2018-04-07 00:00:00       42.9     23.9       11.6       15.1   66.8     26.7
+## # ... with 110 more rows, and 1 more variable: 모름 &amp;lt;dbl&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gallup_president = read_xlsx(&amp;quot;poll_president.xlsx&amp;quot;, sheet = 2, range = cell_cols(&amp;quot;B:H&amp;quot;))
+gallup_president = bind_cols(gallup_president[1:120,], rlmeter_president[,1]) %&amp;gt;% 
+  select(week, everything(), -`월(M)`, -`주(W)`, -`표본 수`)
+gallup_president&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 120 x 5
+##    week                g잘하고있다 g잘못하고있다 g어느쪽도아니다 g모름응답거절
+##    &amp;lt;dttm&amp;gt;                    &amp;lt;dbl&amp;gt;         &amp;lt;dbl&amp;gt;           &amp;lt;dbl&amp;gt;         &amp;lt;dbl&amp;gt;
+##  1 2018-02-03 00:00:00        0.63          0.28            0.04          0.05
+##  2 2018-02-10 00:00:00       NA            NA              NA            NA   
+##  3 2018-02-17 00:00:00        0.68          0.22            0.05          0.04
+##  4 2018-02-24 00:00:00        0.64          0.26            0.04          0.06
+##  5 2018-03-03 00:00:00        0.71          0.22            0.04          0.04
+##  6 2018-03-10 00:00:00        0.74          0.18            0.05          0.04
+##  7 2018-03-17 00:00:00        0.71          0.19            0.06          0.05
+##  8 2018-03-24 00:00:00        0.7           0.21            0.05          0.04
+##  9 2018-03-31 00:00:00        0.74          0.17            0.05          0.04
+## 10 2018-04-07 00:00:00        0.72          0.19            0.05          0.04
+## # ... with 110 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# 위키백과 &amp;#39;대통령 지지도&amp;#39; 항목에서 긁어온 데이터 전처리
+
+wiki = read_xlsx(&amp;quot;wiki_president.xlsx&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mfrow=c(2,1))
+plot.ts(wiki$gallup)
+plot.ts(wiki$rlmeter)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/visual-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;위키백과 항목의 결측값 탓에 푹 꺼진 부분을 제외하고 대강의 추세를 살펴보면, 지난 약 2년여간 대통령의 지지율은 꾸준히 감소해왔음을 알 수 있다. 이는 집권 중반기를 지난 탓에 통상적인 레임덕 현상이 나타났음으로 보이며, 다만 코로나 사태에 대해 성공적인 국정 운영으로 평가받는 최근에 들어서는 지지율이 다소 상승한 추세를 확인할 수 있다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;문재앙-지수-만들기-1-댓글-크롤링&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;문재앙 지수 만들기 (1) 댓글 크롤링&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div id=&#34;네이버-기사-링크-추출&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;네이버 기사 링크 추출&lt;/h2&gt;
+&lt;p&gt;댓글을 크롤링할 기사로 뉴스 랭킹 배너에 조회수 기준 일간 상위 30개의 기사(부문별 5개, 총 6개 부문)을 선정한다.&lt;/p&gt;
+&lt;p&gt;네이버 ‘많이 본 기사’ 랭킹 배너 링크를 들어가보면,
+(“&lt;a href=&#34;https://news.naver.com/main/ranking/popularDay.nhn?rankingType=popular_day&amp;amp;date=20180212&#34; class=&#34;uri&#34;&gt;https://news.naver.com/main/ranking/popularDay.nhn?rankingType=popular_day&amp;amp;date=20180212&lt;/a&gt;”)(2018.2.12일자)
+일간 누적 집계된 조회수 기준 상위 30개의 6개 부문 기사 제목과 링크가 나열되어 있는 것을 확인할 수 있다.
+우리는 여기서 구글 스프레드 시트의 importxml() 함수와 xpath 정규 표현식을 활용하여 일자별 30개의 기사 링크를 긁어올 수 있다.
+여기서 랭킹 배너의 링크에는 일정한 규칙성이 있으므로, 랭킹 배너에 접근할 URL은 main_url(“&lt;a href=&#34;https://news.naver.com&#34; class=&#34;uri&#34;&gt;https://news.naver.com&lt;/a&gt;”)에 sub_url 변수를 for문을 통해 조합하는 방식으로 마련하였다.
+조사 대상 날짜인 2018.02.06 ~ 2020.06. ** 에서 일자별 자동 추출된 30개의 기사링크는 구글 스프레드시트에 쌓고 “naver_df.xlsx” 파일로 추출한 후 이를 R로 불러온다.&lt;/p&gt;
+&lt;p&gt;+) 위와 같이 기사 링크를 추출하는 방식은 importxml() 함수를 사용하기 위해 구글 스프레드시트를 거쳐야 하는 불편함이 다소 있었다. 따라서 ‘다음’ 기사 링크를 추출할 때는 Rstudio 내에서 해당 크롤링 작업을 할 수 있도록 하였다. 즉, ‘xml2’ 패키지의 read_html() 함수와 ‘rvest’ 패키지의 html_nodes() 함수 등을 이용하여 랭킹 배너의 html 소스코드에 열거된 상위 10개 기사의 링크를 가져오도록 했다. (하단 코드 참조)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;댓글-필터링-및-크롤링-좋아요싫어요-수-합산&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;댓글 필터링 및 크롤링, 좋아요/싫어요 수 합산&lt;/h2&gt;
+&lt;p&gt;크롤링할 댓글 양이 상당하다는 점을 감안해 이미 마련된 패키지를 활용하기로 한다. 사용할 패키지는 N2H4, DNH4이며,
+각각 네이버/다음 내부 기사 URL을 인자로 넣으면 해당 기사에 달린 댓글과 좋아요/싫어요 수 등 다양한 변수를 크롤링해준다. 현재까지 문재앙 지수를 산출하는 데 필요한 변수들은 다음과 같다.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;일간 상위 30개 기사에 달린 모든 댓글의 좋아요/싫어요 총합&lt;/li&gt;
+&lt;li&gt;‘문재앙’ 및 관련 어휘가 포함/제외된 모든 댓글의 좋아요/싫어요 총합&lt;/li&gt;
+&lt;li&gt;‘문재앙’ 및 관련 어휘가 포함/제외된 모든 댓글 수&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;그런데 이때, 우리는 타당한 지수 산출을 위해 매크로 및 유령 계정 활용, ‘좌표 찍기’를 비롯한 댓글상의 정치 공작 등의 불필요한 과도표집을 예방해야 할 것이다. 따라서 특정 댓글 내용을 아예 똑같이 복사한 경우인 기사 내/(동일 일자) 기사 간 중복댓글을 표본에서 배제하고, 중복댓글 중 시간상 마지막에 달린 단 1개의 댓글만을 표본에 반영할 것이다. 또한 ’문재앙’ 어휘를 포함한 임의의 1000개 댓글을 훑어본 결과, 100개당 1-2개꼴로 현 대통령을 지지하는 댓글을 발견했는데, 대체로 ‘문재앙 타령’ 이라고 말하는 식이었다. 따라서 ’문재앙’이라는 어휘가 포함된 댓글 중 ’타령’이라는 어휘가 없거나, ’탄핵’이라는 강한 부정어를 포함하는 댓글을 수집하는 것으로 2차 필터링을 거쳤다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;main_url = &amp;quot;https://news.naver.com&amp;quot;
+operator = &amp;quot;/main/ranking/popularDay.nhn?rankingType=popular_day&amp;amp;date=&amp;quot;
+datelist = read_xlsx(&amp;quot;datelist.xlsx&amp;quot;, range = cell_cols(&amp;quot;B&amp;quot;)) %&amp;gt;% as_tibble()
+
+Summary_3 = tibble()
+for (j in 1:nrow(datelist)){
+  Summary_1 = tibble()
+  Summary_2 = tibble()
+  tmp_1 = tibble()
+  tmp_2 = tibble()
+  date = datelist[j,1]
+  doc = read_html(str_c(main_url, operator, date))
+  tmp = html_nodes(doc, &amp;#39;dl&amp;#39;) %&amp;gt;% html_nodes(&amp;#39;a&amp;#39;) %&amp;gt;% html_attr(&amp;quot;href&amp;quot;)
+  tic()
+  for (i in 1:30){
+    sub_url = tmp[i]
+    tmp_1 = getAllComment(str_c(main_url, sub_url)) %&amp;gt;%
+      as_tibble() %&amp;gt;%
+      filter(!duplicated(contents)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;), -imageCount)
+    Summary_1 = bind_rows(Summary_1, tmp_1)
     
-	<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+    tmp_2 = tmp_1 %&amp;gt;%
+      filter(str_detect(contents, &amp;quot;문재앙&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;타령&amp;quot;)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;))
+    Summary_2 = bind_rows(Summary_2, tmp_2)}
+  toc()
+  
+  nrow = nrow(Summary_1)
+  nrow_1 = nrow(Summary_2)
+  Summary_1 = Summary_1 %&amp;gt;%
+    filter(!duplicated(contents))
+  like = sum(Summary_1$sympathyCount)
+  dislike = sum(Summary_1$antipathyCount)
+  
+  Summary_2 = Summary_2 %&amp;gt;%
+    filter(!duplicated(contents))
+  like_1 = sum(Summary_2$sympathyCount)
+  dislike_1 = sum(Summary_2$antipathyCount)
+
+  Summary_3[j, 1] = ymd(date)
+  Summary_3[j, 2] = like
+  Summary_3[j, 3] = dislike
+  Summary_3[j, 4] = nrow
+  Summary_3[j, 5] = like_1
+  Summary_3[j, 6] = dislike_1
+  Summary_3[j, 7] = nrow_1
+
+  print(ymd(date))}
+
+write.csv(Summary_3, &amp;quot;Summary_df_5.csv&amp;quot;)
+
+Summary_3$week = as.Date(cut(Summary_3$...1, breaks = &amp;quot;week&amp;quot;, start.on.monday = FALSE)) - 1
+Summary_3
+for (i in 2:767){
+  Summary_3$week[i-1] = Summary_3$week[i]}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;다음-기사-링크-추출&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;다음 기사 링크 추출&lt;/h2&gt;
+&lt;p&gt;‘다음’의 경우 랭킹 뉴스 배너 조회수 기준 일자별 상위 10개 기사를 댓글 추출 대상으로 한다. (’2019 언론수용자 조사’의 포털별 뉴스 점유율에 따라(네이버 91%, 다음 20%, 중복응답) 기사 갯수를 선정했다.) 크롤링 코드는 다음과 같다. 앞서 언급한대로 ’xml2’, ‘rvest’ 패키지 내장 함수를 통해 html 소스코드에서 일자별 기사 링크를 추출하고 해당 링크 기사에 달린 댓글들에 접근하는 방식을 취하였다. 이떄 사용한 ‘DNH4’ 패키지의 getAllComment() 함수는 패키지상의 오류가 발생하곤 했으므로 상응하는 예외처리를 거쳤다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(DNH4)
+
+main_url = &amp;quot;https://media.daum.net/ranking/popular&amp;quot;
+operator = &amp;quot;?regDate=&amp;quot;
+datelist = read_xlsx(&amp;quot;datelist.xlsx&amp;quot;, range = cell_cols(&amp;quot;B&amp;quot;)) %&amp;gt;% as_tibble()
+linklist = list()
+
+Summary_4 = tibble()
+print(datelist, n = 300)
+
+for (i in 1:nrow(datelist)){
+  Summary_1 = tibble()
+  Summary_2 = tibble()
+  date = datelist[i,1] 
+
+  doc = read_html(str_c(main_url, operator, date))
+  tmp = html_nodes(doc, &amp;#39;li&amp;#39;) %&amp;gt;% html_nodes(&amp;#39;a&amp;#39;) %&amp;gt;% html_attr(&amp;quot;href&amp;quot;)
+  linklist = unique(tmp[44:63])
+
+for (j in 1:length(linklist)){
+  tic()
+  tmp_1 = tibble()
+  tmp_2 = tibble()
+    sub_url = linklist[j]
+    if(is_null(tryNULL(getAllComment(sub_url)))){next} else {
+    tmp_1 = getAllComment(sub_url) %&amp;gt;% as.data.table() %&amp;gt;%
+      as_tibble() %&amp;gt;%
+      filter(!duplicated(content)) %&amp;gt;%
+      select(content, likeCount, dislikeCount)
+    Summary_1 = bind_rows(Summary_1, tmp_1)
     
+    tmp_2 = tmp_1 %&amp;gt;%
+      filter(str_detect(content, &amp;quot;문재앙&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(content, &amp;quot;타령&amp;quot;)) %&amp;gt;%
+      select(content, likeCount, dislikeCount)
+    Summary_2 = bind_rows(Summary_2, tmp_2)}}
+  toc()
+  
+  Summary_1 = Summary_1 %&amp;gt;%
+    filter(!duplicated(content))
+  nrow = nrow(Summary_1)
+  like = sum(Summary_1$likeCount)
+  dislike = sum(Summary_1$dislikeCount)
+  
+  Summary_2 = Summary_2 %&amp;gt;%
+    filter(!duplicated(content))
+  nrow_1 = nrow(Summary_2)
+  like_1 = sum(Summary_2$likeCount)
+  dislike_1 = sum(Summary_2$dislikeCount)
+  
+  Summary_4[i-1, 1] = date
+  Summary_4[i-1, 2] = like
+  Summary_4[i-1, 3] = dislike
+  Summary_4[i-1, 4] = nrow
+  Summary_4[i-1, 5] = like_1
+  Summary_4[i-1, 6] = dislike_1
+  Summary_4[i-1, 7] = nrow_1
+  print(i)}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;daum_disaster_reply = read_xlsx(&amp;quot;daum_disaster_reply.xlsx&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;daum_disaster_reply&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 4,583 x 3
+##    content                                                likeCount dislikeCount
+##    &amp;lt;chr&amp;gt;                                                      &amp;lt;dbl&amp;gt;        &amp;lt;dbl&amp;gt;
+##  1 &amp;quot;문재앙이 기래기&amp;quot;                                              1            0
+##  2 &amp;quot;문재앙, 공산당이 싫어요&amp;quot;                                      0            3
+##  3 &amp;quot;김대중좌빨세끼 국민연금만들고 실실 .... 노무현좌빨세끼 도로명주소법제화시키고 실실.... 문~         0            1
+##  4 &amp;quot;문재앙 정권이 그렇지 뭐&amp;quot;                                      2            3
+##  5 &amp;quot;경찰놈들도 문재앙&amp;quot;                                            1            2
+##  6 &amp;quot;문재앙식 문주주의 크라스에 지렸습니다&amp;quot;                        1            4
+##  7 &amp;quot;문재앙 미 친 새 퀴 때문에 장사 안되는데 ~ 세금만 뜯어 가려 하네? 미 친 놈들 ㅉㅉ&amp;quot;~         2            3
+##  8 &amp;quot;문재앙\n부실기업\n민노총나라국민은제편이라\n마구처발라주고\n되는기업은\n먼지탈탈털어구속&amp;quot;~         0           11
+##  9 &amp;quot;뭘 그리 놀래나.  \n문재앙정부 하는일이 다 그렇치 뭐,,  ㅋ&amp;quot;~         2            0
+## 10 &amp;quot;응 문재앙&amp;quot;                                                    0            1
+## # ... with 4,573 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;‘문재앙’ 어휘를 포함한 댓글이 수집된 데이터를 살펴보자. (예외처리를 거친) 대략 845일간의 ‘문재앙’ 댓글 전량을 수집하였음에도 4500개 댓글뿐으로, 이는 하루 5개 정도의 댓글만이 ‘문재앙’ 어휘를 사용했음을 뜻한다. 다음 플랫폼 주 이용자의 정치적 성향을 고려하더라도 이는 상당히 적은 양의 댓글 수이므로 독립적인 표본으로서 결과에 반영하기 애매한듯 보이므로 우선은 분석 대상에서 제외하는 것이 나을 것 같다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;문재앙-지수-만들기-2-국정-지지도와-초벌-상관-분석&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;문재앙 지수 만들기 (2) 국정 지지도와 초벌 상관 분석&lt;/h2&gt;
+&lt;p&gt;이제 수집된 네이버 댓글 데이터와 위키백과의 ‘대통령 지지도’ 항목에 제시된 국정평가 도표 수치를 비교해보자. 대강의 상관관계를 파악하는 데 도움을 줄 것이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cor(Summary_3[1:119,1:6], wiki[,c(&amp;quot;gallup&amp;quot;, &amp;quot;rlmeter&amp;quot;)])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##                  gallup     rlmeter
+## like_all     0.27487891  0.39347760
+## dislike_all  0.22859883  0.36233054
+## num_all      0.23600060  0.27587070
+## like_1      -0.11599185 -0.05721397
+## dislike_1    0.03731947  0.11840819
+## num_1        0.05650117  0.06989181&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;다소 뜻밖에 결과를 알 수 있는데, ‘문재앙’ 어휘 포함 댓글의 수, 좋아요/싫어요 수치보다 전체 댓글 수, 좋아요, 싫어요 수가 다소 높은 상관을 보이는 것으로 드러나기 때문이다. 따라서 크롤링한 요인들을 활용하여 산출식을 정교화해야 높은 상관관계를 얻을 수 있겠다고 생각된다.
+이쯤에서 조사기간(2018.2 ~ 2020.05) 내 전체 댓글 추이를 한번 살펴보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(Summary, aes(x = week, y = num_all)) +
+  geom_line() +
+  xlab(&amp;quot;조사기간\n(2018년 2월 첫째주 ~ 2020년 5월 셋째주)&amp;quot;)+
+  ylab(&amp;quot;네이버 뉴스 전체 댓글 수&amp;quot;)+
+  scale_y_continuous(breaks = 100000*c(2:5), labels = c(&amp;quot;200000개&amp;quot;, &amp;quot;300000개&amp;quot;, &amp;quot;400000개&amp;quot;, &amp;quot;500000개&amp;quot;))+
+  theme_bw()+
+  geom_smooth(method = &amp;quot;loess&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/ggplot-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;loess 추세선과 함께 살펴보면, 네이버 뉴스창의 (랭킹 배너 일간 조회수 top30 기사 한정) 댓글 수는 꾸준히 감소해 온 것을 알 수 있다. 다만 올해 들어 코로나 사태 영향으로 댓글창이 일시적으로 활발해진 추세도 함께 엿볼 수 있다. 이렇듯 꾸준한 감소세는 앞서 살펴 본 위키백과 항목의 대통령 지지율의 꾸준한 감소와 유사한 패턴을 보이지만, 이 두 가지 현상, 즉 현 대통령의 레임덕과 (이유 모를) 네이버 댓글창의 비활성화가 유의미한 상관관계를 갖는 사회적 현상인지는 의문이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;문재앙-지수-만들기-3-인사이트-파악-후-산출식-수정&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;문재앙 지수 만들기 (3) 인사이트 파악 후 산출식 수정&lt;/h2&gt;
+&lt;p&gt;여기서 나아가 다른 어휘들은 어떤 상관관계가 있을지까지 파악해 보기로 했다. 코드는 다음과 같다.
+(네이버 서버상의 문제인지 같은 일자에서 계속해서 오류가 발생했다. 따라서 for문을 돌리는 와중에 중간중간 오류 발생 시 예외처리를 하고 코드 실행을 재개해야 한다.)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;main_url = &amp;quot;https://news.naver.com&amp;quot;
+operator = &amp;quot;/main/ranking/popularDay.nhn?rankingType=popular_day&amp;amp;date=&amp;quot;
+datelist = read_xlsx(&amp;quot;datelist.xlsx&amp;quot;, range = cell_cols(&amp;quot;B&amp;quot;)) %&amp;gt;% as_tibble()
+# datelist = datelist[774:844, 1]
+
+Summary_3 = tibble()
+
+for (j in 1:nrow(datelist)){
+  Summary_2 = tibble()
+  Summary_4 = tibble()
+  Summary_5 = tibble()
+  Summary_6 = tibble()
+  date = datelist[j,1]
+  doc = read_html(str_c(main_url, operator, date))
+  tmp = html_nodes(doc, &amp;#39;dl&amp;#39;) %&amp;gt;% html_nodes(&amp;#39;a&amp;#39;) %&amp;gt;% html_attr(&amp;quot;href&amp;quot;)
+  tic()
+  tmp_1 = tibble()
+  tmp_2 = tibble()
+  tmp_3 = tibble()
+  tmp_4 = tibble()
+  tmp_5 = tibble()
+  for (i in 1:30){
+    sub_url = tmp[i]
+    tmp_1 = getAllComment(str_c(main_url, sub_url)) %&amp;gt;%
+      as_tibble() %&amp;gt;%
+      filter(!duplicated(contents)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;), -imageCount)
     
-    <item>
-      <title>Presidential excitable speech analysis (2)</title>
-      <link>/posts/presidential-excitable-speech-analysis_2/</link>
-      <pubDate>Sat, 13 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/presidential-excitable-speech-analysis_2/</guid>
-      <description>본 프로젝트는 2회에 걸쳐 게시되었습니다. 첫 번째 게시물은 자료 수집과 전처리 및 산출식 개발 등에 초점을 맞추고, 두 번째 게시물은 본격적인 상관분석, 시각화와 주관적 분석을 다루고 있습니다.
-목차</description>
-    </item>
+    tmp_2 = tmp_1 %&amp;gt;%
+      filter(str_detect(contents, &amp;quot;문죄인&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;일베&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;타령&amp;quot;)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;))
+    Summary_2 = bind_rows(Summary_2, tmp_2)
     
-    <item>
-      <title>Presidential excitable speech analysis (1)</title>
-      <link>/posts/presidential-excitable-speech-analysis_1/</link>
-      <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/presidential-excitable-speech-analysis_1/</guid>
-      <description>본 프로젝트는 2회에 걸쳐 게시되었습니다. 첫 번째 게시물은 자료 수집과 전처리 및 산출식 개발 등에 초점을 맞추고, 두 번째 게시물은 본격적인 상관분석, 시각화와 주관적 분석을 다루고 있습니다.
-목차</description>
-    </item>
+    tmp_3 = tmp_1 %&amp;gt;%
+      filter(str_detect(contents, &amp;quot;중국몽&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;일베&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;타령&amp;quot;)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;))
+    Summary_4 = bind_rows(Summary_4, tmp_3)
     
-    <item>
-      <title>SOTU Text Analysis</title>
-      <link>/posts/sotu-text-analysis/</link>
-      <pubDate>Fri, 01 May 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/sotu-text-analysis/</guid>
-      <description>도입데이터 호출 및 전처리UC Santa Barbara의 ‘The American Presidency project’에서는 매해 단위로 수집한 역대 미국 대통령의 의회 국정연설문을 텍스트 데이터로 아카이빙하고 있다. ’State of the Union’(SOTU) 데이터셋이 바로 그것인데, 초대 대통령 조지 워싱턴(1789~1797 재임)부터 45대 대통령 도널드 트럼프(2017~)의 구두/서면 연설문이 txt 파일 형태로 정리되어 있다.</description>
-    </item>
+    tmp_4 = tmp_1 %&amp;gt;%
+      filter(str_detect(contents, &amp;quot;문슬람&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;일베&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;타령&amp;quot;)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;))
+    Summary_5 = bind_rows(Summary_5, tmp_4)
     
-    <item>
-      <title>Spatial data in golden time project</title>
-      <link>/posts/spatial-data/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/posts/spatial-data/</guid>
-      <description>도입이번 ‘데이터 사이언스 입문’ 수업의 팀 프로젝트에서는 ’응급의료취약지 분석/도출 및 시각화’라는 주제로 공공 api가 제공하는 텍스트 데이터와 행정구역도 공간 데이터를 주로 활용했다. 여기서 공간 데이터는 데이터 용량도 클 뿐만 아니라 별도의 전처리 및 계산법이 필요하기 때문에 로직을 정하고 R 코드를 작성하는데 적지 않은 어려움이 있었다.</description>
-    </item>
-    
-  </channel>
-</rss>
+    tmp_5 = tmp_1 %&amp;gt;%
+      filter(str_detect(contents, &amp;quot;대깨문&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;일베&amp;quot;)) %&amp;gt;%
+      filter(!str_detect(contents, &amp;quot;타령&amp;quot;)) %&amp;gt;%
+      select(contents, ends_with(&amp;quot;Count&amp;quot;))
+    Summary_6 = bind_rows(Summary_6, tmp_5)}
+  toc()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(엑셀 스프레드시트로 변수명 변경 및 열 배치 등 간단한 전처리를 했다.)&lt;/p&gt;
+&lt;p&gt;나아가, 보다 구체적이고 유의미한 결과 도출을 위해 나는 주 단위 단순 긍정/부정평가 항목 이외에 ‘정치성향별 국정평가’ 항목 및 일 단위 긍정/부정평가 항목 수치까지 수집했다. 방식은 역시 주간집계 PDF 보고서 파일에서 스프레드시트로 일일이 복사+붙여넣기하는 노가다에 가까웠는데, 이 과정을 효율적으로 운용하기 위해서는 여론조사 기관의 간결한 결과 제시가 필요해 보인다.&lt;/p&gt;
+&lt;p&gt;자, 이제 우리는 다양한 산출식을 생각해 볼 수 있다. 나는 우선 3가지 산출식 옵션을 생각했는데, &lt;strong&gt;3가지 옵션&lt;/strong&gt;은 다음과 같다.&lt;/p&gt;
+&lt;div id=&#34;전체-좋아요-수-전체-좋아요-싫어요-수---문재앙-좋아요-수-문재앙-좋아요-싫어요-수&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;1. 전체 좋아요 수 / (전체 좋아요 + 싫어요 수) - 문재앙 좋아요 수 / (문재앙 좋아요 + 싫어요 수)&lt;/h4&gt;
+&lt;/div&gt;
+&lt;div id=&#34;좋아요-수-좋아요-싫어요-수&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;2. 좋아요 수 / (좋아요 + 싫어요 수)&lt;/h4&gt;
+&lt;/div&gt;
+&lt;div id=&#34;좋아요-싫어요-수-좋아요-수log단어-포함-댓글-수전체-댓글-수&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;3. {(좋아요 + 싫어요 수) / 좋아요 수}*log(단어 포함 댓글 수/전체 댓글 수)&lt;/h4&gt;
+&lt;p&gt;한눈에 보기에도 가장 간단한 식은 2번이다. 비하 단어를 포함한 댓글의 주간 좋아요 수와 싫어요 수 합산만 고려하면 된다. 여기에 주간 댓글 좋아요/싫어요 동향을 반영하여 두 수치를 빼면 1번 식이 나오고, 주간 댓글 좋아요/싫어요 동향을 반영하는 대신, 주간 전체 댓글 수 대비 비하 단어 포함 작성된 댓글 수 비율의 가중치를 두면 3번 식이 나온다. 이때 비하 단어 포함 댓글은 전체 댓글에 비해 상당히 적은 비율을 갖고 있기 때문에 이를 고려하여 로그 변환을 해주는 것이 나을 것이라 판단했다.&lt;/p&gt;
+&lt;p&gt;댓글 및 좋아요/싫어요 수가 상식적으로 나온다면, 1번과 3번 식은 국정 지지도와 정적 상관을, 2번 식은 부적 상관을 가지게 될 것이다. 정말로 그러한지 확인해볼겸 나는 1차적인 수식 검증을 할 것이다. 5개의 비하 단어와 32개의 기본 국정평가 항목 중 각각이 얼마큼 유의미한 상관관계를 갖는지 확인한다. 160개의 항목 중 유의도 .05를 넘는 항목의 갯수가 크게 낮으면 정확한 지수 산출식이라고 볼 수 없을 것이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;예시&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;예시&lt;/h4&gt;
+&lt;div id=&#34;option-1.&#34; class=&#34;section level5&#34;&gt;
+&lt;h5&gt;Option 1.&lt;/h5&gt;
+&lt;div id=&#34;전체-좋아요-수-전체-좋아요-싫어요-수---문재앙-좋아요-수-문재앙-좋아요-싫어요-수-1&#34; class=&#34;section level6&#34;&gt;
+&lt;h6&gt;전체 좋아요 수 / (전체 좋아요 + 싫어요 수) - 문재앙 좋아요 수 / (문재앙 좋아요 + 싫어요 수)&lt;/h6&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Summary.df = Summary %&amp;gt;%
+  mutate(disaster = like_all/(like_all+dislike_all) - (like_1)/(like_1+dislike_1),
+         sinner = like_all/(like_all+dislike_all) - (like_2)/(like_2+dislike_2),
+         china = like_all/(like_all+dislike_all) - (like_3)/(like_3+dislike_3),
+         islam = like_all/(like_all+dislike_all) - (like_4)/(like_4+dislike_4),
+         head = like_all/(like_all+dislike_all) - (like_5)/(like_5+dislike_5)) %&amp;gt;%
+  select(week, disaster, sinner, china, islam, head, everything())
+
+Summary.df = full_join(Summary.df, rlmeter_president, by = &amp;quot;week&amp;quot;) %&amp;gt;% 
+  full_join(gallup_president, by = &amp;quot;week&amp;quot;) %&amp;gt;%
+  select(-week) %&amp;gt;%
+  bind_cols(ideo) %&amp;gt;% 
+  select(-week)
+
+mySumm = tibble()
+for (i in colnames(Summary.df[1:5])){
+  for (j in colnames(Summary.df[24:55])){
+    formula = as.formula(str_c(&amp;quot;~&amp;quot;,i,&amp;quot;+&amp;quot;,j))
+   myCorr = cor.test(formula, data = Summary.df) %&amp;gt;% tidy()
+   myCorr$word = i
+   myCorr$eval = j
+    mySumm = bind_rows(myCorr, mySumm)
+  }
+}
+mySumm %&amp;gt;% arrange(p.value) %&amp;gt;%
+  select(word, eval, estimate, everything(), -method) %&amp;gt;%
+  filter(p.value&amp;lt;.05)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 106 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;
+##  1 disa~ g잘하고~    0.653      8.91 1.46e-14       107    0.530     0.749
+##  2 disa~ 매우잘한~    0.636      8.79 1.81e-14       114    0.513     0.733
+##  3 disa~ g잘못하~   -0.647     -8.77 3.04e-14       107   -0.744    -0.522
+##  4 disa~ 잘한다~    0.627      8.59 5.27e-14       114    0.502     0.726
+##  5 disa~ 잘못한다~   -0.626     -8.57 5.78e-14       114   -0.725    -0.501
+##  6 sinn~ 진보잘못~   -0.630     -8.58 6.19e-14       112   -0.729    -0.504
+##  7 sinn~ 매우잘한~    0.622      8.47 9.67e-14       114    0.495     0.722
+##  8 disa~ 진보잘못~   -0.624     -8.45 1.21e-13       112   -0.725    -0.497
+##  9 disa~ 중도잘한~    0.620      8.35 1.98e-13       112    0.492     0.721
+## 10 disa~ 중도잘못~   -0.619     -8.33 2.23e-13       112   -0.721    -0.490
+## # ... with 96 more rows, and 1 more variable: alternative &amp;lt;chr&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# option 2
+mySumm %&amp;gt;% arrange(p.value) %&amp;gt;%
+  select(word, eval, estimate, everything(), -method) %&amp;gt;%
+  filter(p.value&amp;lt;.05)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 108 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;
+##  1 disa~ 잘한다~   -0.668     -9.59 2.54e-16       114   -0.758    -0.553
+##  2 disa~ 잘못한다~    0.665      9.50 4.02e-16       114    0.549     0.756
+##  3 disa~ 중도잘한~   -0.669     -9.53 4.03e-16       112   -0.760    -0.553
+##  4 disa~ 매우잘한~   -0.664     -9.48 4.48e-16       114   -0.755    -0.548
+##  5 disa~ 중도잘못~    0.667      9.48 5.20e-16       112    0.551     0.758
+##  6 disa~ 보수매우~    0.660      9.30 1.34e-15       112    0.542     0.753
+##  7 disa~ 보수잘못~    0.659      9.27 1.61e-15       112    0.540     0.752
+##  8 disa~ 중도매우~   -0.658     -9.24 1.87e-15       112   -0.751    -0.539
+##  9 disa~ 보수매우~   -0.653     -9.13 3.32e-15       112   -0.747    -0.533
+## 10 disa~ g잘하고~   -0.661     -9.12 5.07e-15       107   -0.755    -0.540
+## # ... with 98 more rows, and 1 more variable: alternative &amp;lt;chr&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# option 3
+mySumm.2 %&amp;gt;% arrange(p.value) %&amp;gt;%
+  select(word, eval, estimate, everything(), -method) %&amp;gt;%
+  filter(p.value&amp;lt;.05)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 121 x 9
+##    word  eval  estimate statistic  p.value parameter conf.low conf.high
+##    &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;int&amp;gt;    &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt;
+##  1 head  중도잘못~    0.779      13.1 2.05e-24       112    0.694     0.842
+##  2 head  중도잘한~   -0.772     -12.9 8.41e-24       112   -0.837    -0.686
+##  3 head  중도매우~    0.765      12.6 3.95e-23       112    0.676     0.832
+##  4 head  보수잘못~    0.762      12.5 6.59e-23       112    0.673     0.830
+##  5 head  보수매우~    0.761      12.4 8.01e-23       112    0.672     0.829
+##  6 head  매우잘못~    0.757      12.4 8.99e-23       114    0.666     0.825
+##  7 head  잘못한다~    0.756      12.3 9.72e-23       114    0.666     0.825
+##  8 head  보수잘한~   -0.752     -12.1 5.60e-22       112   -0.822    -0.659
+##  9 head  잘한다~   -0.737     -11.6 3.91e-21       114   -0.811    -0.641
+## 10 head  중도매우~   -0.722     -11.0 1.33e-19       112   -0.799    -0.620
+## # ... with 111 more rows, and 1 more variable: alternative &amp;lt;chr&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위와 같은 코드로 3개의 산출식을 계산했을 때 각각 &lt;strong&gt;106, 108, 121개&lt;/strong&gt;의 유의미한 항목 결과가 나온다. 모름/무응답 항목도 포함된 만큼 세 가지 산출식 모두 다소 유의한 항목 갯수라고 볼 수 있을 듯하다. 2번 산출식에서 전체 댓글 좋아요 주간 동향을 반영한 1번 산출식이 조금 더 유의도가 떨어졌다는 점에서 ‘비하 단어’ 포함 댓글은 전체 댓글의 좋아요 수를 고려하지 않았을 때 더욱 여론의 효과적인 재현 지표로 볼 수 있다는 것을 알 수 있다. 또한 3번 산출식이 정확도가 가장 높아보이는데, 2번과 3번의 scattorplot을 보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## Option 2
+par(mfrow = c(2, 2))
+plot(Summary.df$disaster, Summary.df.2$잘못한다, main = &amp;quot;문재앙 지수&amp;quot;)
+plot(Summary.df$sinner, Summary.df.2$잘못한다, main = &amp;quot;문죄인 지수&amp;quot;)
+plot(Summary.df$islam, Summary.df.2$잘못한다, main = &amp;quot;문슬람 지수&amp;quot;)
+plot(Summary.df$head, Summary.df.2$잘못한다, main = &amp;quot;대깨문 지수&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;## Option 3
+par(mfrow = c(2, 2))
+plot(Summary.df.2$disaster, Summary.df.2$잘못한다, main = &amp;quot;문재앙 지수&amp;quot;)
+plot(Summary.df.2$sinner, Summary.df.2$잘못한다, main = &amp;quot;문죄인 지수&amp;quot;)
+plot(Summary.df.2$islam, Summary.df.2$잘못한다, main = &amp;quot;문슬람 지수&amp;quot;)
+plot(Summary.df.2$head, Summary.df.2$잘못한다, main = &amp;quot;대깨문 지수&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;어떤 지수를 활용할 지는 우리 마음이지만, 나는 가장 단순한 2번 산출식과 estimate가 가장 높은 항목을 도출한 3번 산출식 이 두 가지 지표를 모두 활용해서 각각 시각화해보기로 했다. 본격적인 시각화와 상응하는 주관적 분석에 대해서는 다음 게시물에서 다루도록 하겠다.&lt;/p&gt;
+&lt;p&gt;&lt;mark&gt;(2편에 계속)&lt;/mark&gt;&lt;/p&gt;
+&lt;style&gt;
+body {
+  font-family: NanumGothic;
+  fontsize = 8px
+}
+&lt;/style&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+       <item>
+         <title>SOTU Text Analysis</title>
+         <link>/posts/sotu-text-analysis/</link>
+         <pubDate>Fri, 01 May 2020 00:00:00 +0000</pubDate>
+         
+         <guid>/posts/sotu-text-analysis/</guid>
+         <description>
+
+
+&lt;div id=&#34;도입&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;도입&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div id=&#34;데이터-호출-및-전처리&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;데이터 호출 및 전처리&lt;/h1&gt;
+&lt;p&gt;UC Santa Barbara의 ‘The American Presidency project’에서는 매해 단위로 수집한 역대 미국 대통령의 의회 국정연설문을 텍스트 데이터로 아카이빙하고 있다. ’State of the Union’(SOTU) 데이터셋이 바로 그것인데, 초대 대통령 조지 워싱턴(1789~1797 재임)부터 45대 대통령 도널드 트럼프(2017~)의 구두/서면 연설문이 txt 파일 형태로 정리되어 있다. URL 역시 크롤링하기 간편한 규칙성을 띠고 있어 txt 파일데이터 전량을 손쉽게 크롤링할 수 있다.
+URL 링크 접근과 크롤링을 위해 정리된 메타데이터 엑셀 파일과, 정리된 연설문 파일을 불러오는 것부터 시작하자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+library(tidytext)
+library(tm)
+library(quanteda)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;list.files()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;stu = read.csv(&amp;quot;STU_address_metadata.csv&amp;quot;,header=T) %&amp;gt;% as_tibble()
+head(stu)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 8
+##   label href           president  president_no years  title        date   doc_id
+##   &amp;lt;fct&amp;gt; &amp;lt;fct&amp;gt;          &amp;lt;fct&amp;gt;      &amp;lt;fct&amp;gt;        &amp;lt;fct&amp;gt;  &amp;lt;fct&amp;gt;        &amp;lt;fct&amp;gt;   &amp;lt;int&amp;gt;
+## 1 2017  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      1
+## 2 2018  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Janua~      2
+## 3 2019  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      3
+## 4 2020  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      4
+## 5 2013  https://www.p~ Barack Ob~ 44th         2009 ~ Address Bef~ Febru~      5
+## 6 2014  https://www.p~ Barack Ob~ 44th         2009 ~ Address Bef~ Janua~      6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이번 텍스트 데이터 전처리는 tidytext 패키지의 unnest_tokens() 함수를 이용한다. 연설문 텍스트 파일을 tibble 형태로 불러온 후, 연결된 문장을 단어별로 구획해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;doc_1 = read_lines(&amp;quot;doc_1.txt&amp;quot;) %&amp;gt;% as_tibble() %&amp;gt;% 
+  unnest_tokens(words, value, token=&amp;quot;words&amp;quot;)
+
+head(doc_1, n = 10)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 10 x 1
+##    words    
+##    &amp;lt;chr&amp;gt;    
+##  1 thank    
+##  2 you      
+##  3 very     
+##  4 much     
+##  5 mr       
+##  6 speaker  
+##  7 mr       
+##  8 vice     
+##  9 president
+## 10 members&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;평균-단어-수-계산&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;평균 단어 수 계산&lt;/h1&gt;
+&lt;p&gt;보기와 같이 띄어쓰기를 기준으로 한 어절 단위로 연설문이 처리되었음을 알 수 있다. 이제 우리는 해당 텍스트 데이터의 기본적인 분석에 착수할 수 있다. 우선 연설문당 평균 단어수를 계산해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tmp = stu %&amp;gt;% as_tibble() %&amp;gt;%
+  select(president, doc_id, president_no) %&amp;gt;%
+  arrange(doc_id)
+
+wnum = list()
+for (i in 1:max(tmp$doc_id)){
+  doc_n = read_lines(str_c(&amp;quot;doc_&amp;quot;, as.character(i),&amp;quot;.txt&amp;quot;)) %&amp;gt;% as_tibble %&amp;gt;%
+    unnest_tokens(words, value, token = &amp;quot;words&amp;quot;)
+  wnum = bind_rows(wnum, count(doc_n))
+}
+anyNA(cbind(tmp, wnum))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] FALSE&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A1 = cbind(tmp, wnum) %&amp;gt;% as_tibble
+
+meanword = list()
+mw = list()
+pname = list()
+tmpname = list()
+for (i in 1:42){
+mw = mean(A1$n[A1$president == unique(A1$president)[i]])
+meanword[[i]] = mw
+tmpname = as.character(unique(A1$president)[i])
+pname[[i]] = tmpname
+}
+a = as.data.frame(cbind(meanword, pname))
+a = a[nrow(a):1,]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이때 22대, 24대 대통령은 ’Grover Cleveland’로, 연속 연임 대통령이 아닌 유일한 2선 대통령이므로 별도의 전처리를 거쳐야 한다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(mean(A1$n[A1$president_no == &amp;quot;22nd&amp;quot;]),0) # 22대 대통령 재임시절 Cleveland&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 13401&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(mean(A1$n[A1$president_no == &amp;quot;24th&amp;quot;]),0) # 24대 대통령 재임시절 Cleveland&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 14652&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;a$meanword[21] == as.numeric(a$meanword[a$pname == &amp;quot;Grover Cleveland&amp;quot;])&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;b = round(as.numeric(a$meanword[-21])) %&amp;gt;% as_tibble()
+c = b[1:19,]
+c[20:22, ] = c(13401, 13668, 14652)
+c[23:43,] = b[21:41,]&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;인칭대명사-사용-빈도-계산&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;인칭대명사 사용 빈도 계산&lt;/h2&gt;
+&lt;p&gt;1~3인칭 단/복수 인칭대명사의 빈도 역시 우리에게 많은 것을 알려줄 수 있다. 대통령별 각 대명사의 사용 빈도를 알아보자. 이때 unnest_token() 함수로 구분된 어절은 모두 소문자로 시작하므로 결측을 배제하기 위한 별도의 전처리가 필요 없다. 대명사 종류별 수집할 어휘는 다음과 같다. (2인칭의 경우 단/복수 형태의 구분이 없으므로 함께 고려한다.)&lt;/p&gt;
+&lt;p&gt;1인칭 단수 : i, my, me, mine
+1인칭 복수 : we, us, our, ours
+2인칭 단수/복수 : you, your, yours
+3인칭 단수 : he, she, his, her, him
+3인칭 복수 : they, their, them, theirs&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tmp_2 = tibble()
+for (i in 1:max(tmp$doc_id)){
+  doc_n = read_lines(str_c(&amp;quot;doc_&amp;quot;,as.character(i),&amp;quot;.txt&amp;quot;)) %&amp;gt;% as_tibble %&amp;gt;%
+    unnest_tokens(words, value, token = &amp;quot;words&amp;quot;)
+  tmp_2[i,1] = nrow(doc_n)
+  tmp_2[i,2] = sum(length(doc_n$words[doc_n$words == &amp;quot;i&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;my&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;me&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;mine&amp;quot;]))
+  tmp_2[i,3] = sum(length(doc_n$words[doc_n$words == &amp;quot;we&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;our&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;us&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;ours&amp;quot;]))
+  tmp_2[i,4] = sum(length(doc_n$words[doc_n$words == &amp;quot;you&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;your&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;yours&amp;quot;]))
+  tmp_2[i,5] = sum(length(doc_n$words[doc_n$words == &amp;quot;he&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;she&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;his&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;her&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;him&amp;quot;]))
+  tmp_2[i,6] = sum(length(doc_n$words[doc_n$words == &amp;quot;they&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;their&amp;quot;]),
+  length(doc_n$words[doc_n$words == &amp;quot;them&amp;quot;]), length(doc_n$words[doc_n$words == &amp;quot;theirs&amp;quot;]))
+}
+A2 = inner_join(A1, tmp_2, c(&amp;quot;n&amp;quot;=&amp;quot;...1&amp;quot;)) %&amp;gt;% unique()
+
+head(A2)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 9
+##   president       doc_id president_no     n  ...2  ...3  ...4  ...5  ...6
+##   &amp;lt;fct&amp;gt;            &amp;lt;int&amp;gt; &amp;lt;fct&amp;gt;        &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt; &amp;lt;int&amp;gt;
+## 1 Donald J. Trump      1 45th          5096    54   237    29    29    60
+## 2 Donald J. Trump      2 45th          5926    51   253    52    62    80
+## 3 Donald J. Trump      3 45th          5798    63   230    47    42    47
+## 4 Donald J. Trump      4 45th          6387    81   199    91    65    33
+## 5 Barack Obama         5 44th          6897    46   299    22    33    69
+## 6 Barack Obama         6 44th          7114    74   235    30    56    71&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A2_1 = tibble()
+A2_1 = A2 %&amp;gt;%
+  mutate(...2 = 100*...2/n,
+         ...3 = 100*...3/n,
+         ...4 = 100*...4/n,
+         ...5 = 100*...5/n,
+         ...6 = 100*...6/n)
+
+A2_2 = tibble()
+for (i in 1:42){
+  A2_2[i,1] = unique(A2_1$president)[i]
+  A2_2[i,2] = round(mean(A2_1$n[A2_1$president == unique(A2_1$president)[i]]),0)
+  A2_2[i,3] = round(mean(A2_1$...2[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,4] = round(mean(A2_1$...3[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,5] = round(mean(A2_1$...4[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,6] = round(mean(A2_1$...5[A2_1$president == unique(A2_1$president)[i]]),2)
+  A2_2[i,7] = round(mean(A2_1$...6[A2_1$president == unique(A2_1$president)[i]]),2)
+  } 
+A2_2[22,] ## Grover Cleveland
+A2_2 = A2_2[-22,]&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A2_2 %&amp;gt;%
+  mutate(rown = row_number()) %&amp;gt;% arrange(desc(rown)) %&amp;gt;%
+  rename(&amp;quot;president&amp;quot; = ...1, &amp;quot;totalwords&amp;quot; = ...2, &amp;quot;I&amp;quot; = ...3, &amp;quot;we&amp;quot; = ...4, &amp;quot;you&amp;quot; = ...5, &amp;quot;he/she&amp;quot; = ...6,          &amp;quot;they&amp;quot; = ...7)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 41 x 8
+##    president         totalwords     I    we   you `he/she`  they  rown
+##    &amp;lt;fct&amp;gt;                  &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;int&amp;gt;
+##  1 George Washington       2082 1.04   1.25  0.83     0.17  1.18    41
+##  2 John Adams              1789 0.9    1.81  0.56     0.31  1.16    40
+##  3 Thomas Jefferson        2584 0.47   2.4   0.53     0.2   1.77    39
+##  4 James Madison           2711 0.34   1.38  0.17     0.51  0.98    38
+##  5 James Monroe            5290 0.32   1.25  0.12     0.36  1.19    37
+##  6 John Quincy Adams       7774 0.18   1.15  0.1      0.32  1.28    36
+##  7 Andrew Jackson         11273 0.84   1.32  0.27     0.37  1.11    35
+##  8 Martin van Buren       11365 0.56   0.83  0.23     0.16  1.34    34
+##  9 John Tyler              8517 0.570  0.73  0.32     0.45  0.75    33
+## 10 James K. Polk          18054 0.39   1.28  0.12     0.84  1.25    32
+## # ... with 31 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;시각화&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;시각화&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;대통령별-평균-단어-수-시각화&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;대통령별 평균 단어 수 시각화&lt;/h1&gt;
+&lt;p&gt;우선 처음에 구한 대통령별 연설문 평균 단어 수를 시각화해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A2_3 = tibble()
+for (i in 0:42){
+  A2_3[i+1,1] = unique(A2_1$president_no)[43-i]
+  A2_3[i+1,2] = unique(A2_1$president)[43-i]}
+for (i in 1:19){
+A2_3[c(i,i+1),2] = A2_3[c(i+1, i),2]}
+A2_3[20,2] = unique(A2_1$president)[22]
+
+A3_1 = bind_cols(A2_3, c)
+A3_1 = A3_1 %&amp;gt;%
+  rename(&amp;quot;president_no&amp;quot; = ...1, &amp;quot;president&amp;quot; = ...2) &lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A3_1 = A3_1 %&amp;gt;% 
+  mutate(president_no = str_extract(president_no,&amp;quot;[[:digit:]]{1,2}&amp;quot;),
+         president_no = as.numeric(president_no))
+
+A3_1 %&amp;gt;%
+  ggplot(aes(x = 46-president_no, y = value)) +
+  geom_point(size = 2) +
+  geom_line() +
+  labs(x=&amp;quot;President of the United States&amp;quot;,
+       y=&amp;quot;Average number of words addressed&amp;quot;) +
+  ylim(c(1000,25000)) +
+  scale_x_continuous(breaks=46-A3_1$president_no,
+                     labels=A3_1$president) +
+  theme(axis.text.x.bottom = element_text(angle = 45)) +
+  theme_light()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;이때, 대통령별 변화량에 주목하기보다 시대 변화에 따른 추이를 보고 싶다면 축을 세로로 돌리면 좀 더 보기 편할 것이다. ggplot 패키지의 coord_flip() 함수를 이용하면 된다. 추가적으로 추세선과 함께 그래프를 보면 전반적인 추이를 검토하기 더욱 편할 것이다. 이때 추세선은 전반적이고 유동적인 추이를 시각화하여 제공하고자 함이 주 사용목적이므로 geom_smooth(method = ‘loess’)를 이용하자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A3_1 %&amp;gt;%
+  ggplot(aes(x = 46-president_no, y = value)) +
+  geom_point(size = 2) +
+  geom_line() +
+  geom_smooth() +
+  labs(x=&amp;quot;President of the United States&amp;quot;,
+       y=&amp;quot;Average number of words addressed&amp;quot;) +
+  ylim(c(1000,25000)) +
+  scale_x_continuous(breaks=46-A3_1$president_no,
+                     labels=A3_1$president) +
+  coord_flip() +
+  theme_light()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-11-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;당시 미국의 역사적 흐름과 결부해 위와 같이 평균 단어 수가 변화하는 추세를 분석해보면 다음과 같다.
+개국부터 남북전쟁, 독립전쟁 및 노예제 폐지를 지나 20세기 초반의 경제 호황기에 접어들기까지 미국은 정치 부문의 민주적 발전과 경제 부문의 양적 팽창을 도모해 왔다. 이에 따라 대통령은 자신의 국정 연설에 국가가 나아갈 방향에 대한 제언 등 여러 강조 사항을 담고자 했을 것이다. 그런데, 27대 대통령 윌리엄 태프트 재임 기간에서 28대 대통령 우드로 윌슨 재임 기간으로 넘어가는 지점에서는 평균 단어 수의 추이가 급감하는데, 그 이유는 앞서 언급한 역사적 맥락과 비교해 훨씬 명확하다. USCB(Univ. Santa Barbara)의 한 에세이에 따르면, 3대 대통령 토머스 제퍼슨부터 28대 대통령 우드로 윌슨 대통령 직전까지 이어져 온 서면(written) 연설 방식이 구두(oral) 연설 방식으로 바뀐 것이다. 구두로 연설하는 탓에 연설문당 단어 수가 기존과 같이 2만 개를 넘기기는 어려웠을 것이며, 따라서 연설문 분량은 발언하기 적당한 정도로 조정되어야 했을 것이다.
+또한, 33대 대통령 해리 트루먼 이래로는 연설이 TV로 방송되기 시작해 훨씬 다양한 계층에 분포한 대중들도 연설을 접할 수 있게 되었다. 따라서 문장은 이전보다 쉽고 간결해져야 했을 것이며 연설 분량은 평균화되어, 이에 평균 단어 수는 일정량에 수렴하게 되었을 것이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;인칭대명사-시각화&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;인칭대명사 시각화&lt;/h1&gt;
+&lt;p&gt;이번엔 인칭대명사를 시각화해보자. 그 중에서 분석하기 용이하다고 판단되는 1인칭 복수대명사(‘우리’)의 대통령별 사용빈도를 살펴보자. 전반적인 그래프와 코드는 앞서 평균 단어 수에 사용한 방식과 동일하다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;A4_1 = full_join(A3_1, A2_2, by = c(&amp;quot;value&amp;quot; = &amp;quot;...2&amp;quot;))
+A2 = A2 %&amp;gt;% 
+  mutate(A2_num = as.numeric(str_extract(A2$president_no,&amp;quot;[[:digit:]]{1,2}&amp;quot;)))
+
+for (i in 1:43){
+  A4_1[i,10] = sum(A2$...3[A2$A2_num == unique(A4_1$president_no)[i]])
+}
+
+A4_1 = A4_1[,c(1,2,3,10)] %&amp;gt;% rename(&amp;#39;p1_plural&amp;#39;= ...10)
+A4_1 %&amp;gt;%
+  ggplot(aes(x = 46-president_no, y = p1_plural)) +
+  geom_point(size = 2) +
+  geom_line() +
+  geom_smooth() +
+  labs(x=&amp;quot;President of the United States&amp;quot;,
+       y=&amp;quot;Average number of 1P Plural form words addressed&amp;quot;) +
+  ylim(c(0,3500)) +
+  scale_x_continuous(breaks=46-A3_1$president_no,
+                     labels=A3_1$president) +
+  coord_flip() +
+  theme_light()&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## `geom_smooth()` using method = &amp;#39;loess&amp;#39; and formula &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;우리는 여기서 시대에 따른 ‘우리’ 어휘 사용의 일정한 경향성을 파악할 수 있다.&lt;/p&gt;
+&lt;div id=&#34;주관적-해석&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;주관적 해석&lt;/h2&gt;
+&lt;p&gt;왜 ‘우리’를 많이 썼을까? UC Santa Barbara Presidency project 웹사이트의 설명을 참조하여 나름대로 분석해 보면 다음과 같다.
+연설이 방송되기 시작한 33대 대통령 해리 트루먼 재임 기간 즈음에서부터 연설문당 ‘우리’를 1500단어 이상, 즉 이전과 달리 아주 빈번하게 사용하는 대통령들이 등장하고 있다. ‘우리’라는 대명사에는 화자인 대통령과 예상 청자가 한데 묶여 있는데, 여기서 예상 청자는 TV를 통해 대통령의 국정 연설을 접하게 된 아주 다양한 계층의 시민들일 것이다. 더군다나 20세기 초중반에 이르러 미국의 여성, 원주민, 유색인종 등은 일정한 나이가 되면 자연히 투표권을 부여받는 ‘실질적’ 보통선거권을 누리게 되었다. 따라서 대통령은 국가 권력 행사의 정당성이 비롯되는 시민들의 정치 참여, 즉 다양한 사회 계층으로 이뤄진 대중들의 정치적 영향력을 의식할 수밖에 없었을 것이다.
+이러한 사회적 맥락 속에서 대통령들은 ‘우리’라는 대명사를 빈번히 사용하여 예상 청자인 시민들과의 친밀감 혹은 시민들의 정치적 소속감을 유도하고, 궁극적으로 자신들의 권력 행사에 대한 정당성을 안전하게 보장받고자 했을 것이다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+       <item>
+         <title>Spatial data in golden time project</title>
+         <link>/posts/spatial-data/</link>
+         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+         
+         <guid>/posts/spatial-data/</guid>
+         <description>
+
+
+&lt;div id=&#34;도입&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;도입&lt;/h2&gt;
+&lt;p&gt;이번 ‘데이터 사이언스 입문’ 수업의 팀 프로젝트에서는 ’응급의료취약지 분석/도출 및 시각화’라는 주제로 공공 api가 제공하는 텍스트 데이터와 행정구역도 공간 데이터를 주로 활용했다. 여기서 공간 데이터는 데이터 용량도 클 뿐만 아니라 별도의 전처리 및 계산법이 필요하기 때문에 로직을 정하고 R 코드를 작성하는데 적지 않은 어려움이 있었다. 그러나 역시 어려울 수록 많이 배우는 것 같다. 직접 작성한 R코드를 한 번 리뷰하면서 공간데이터를 전처리하고 계산하는 법을 소개하도록 하겠다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;공간-데이터-불러오기&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;공간 데이터 불러오기&lt;/h2&gt;
+&lt;p&gt;공간 데이터 형식인 ESRI shapefile(이하 ‘.shp’)은 위키백과에 ‘a geospatial vector data format for geographic information system (GIS) software’(지리 정보 시스템 소프트웨어를 위한 지리 공간 벡터 데이터 형식)으로 소개되어 있다. 이렇듯 특정 확장자의 파일을 읽으려면 새로운 R 패키지가 필요할 것이다. 여기서는 readOGR() 함수를 포함한 rgdal 패키지를 이용하며, 함께 불러올 sp 패키지는 이름에서도 알 수 있듯 공간데이터 처리를 위함이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(sp)
+library(rgdal)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;그리고 공공 데이터 포털에서 미리 api로 호출하여 엑셀로 정리한 ’응급의료기관 기본정보 조회 서비스’와 ’응급의료기관 목록정보 조회 서비스’를 불러와보자. 우선 우리는 응급의료기관 좌표값, 병원명 및 고유번호 정보 정도만을 활용할 것이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;result_table_1 = read_xlsx(&amp;quot;응급의료기관 기본정보 조회 서비스_1.xlsx&amp;quot;) #1은 오퍼레이터 번호
+result_table_3 = read_xlsx(&amp;quot;응급의료기관 목록정보 조회 서비스_3.xlsx&amp;quot;) #3은 오퍼레이터 번호&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이번에는 공간 데이터를 불러오자. 대한민국 행정구역 데이터는 행정안전부 도로명주소 개발자센터 등 국가기관에서 제공하고 있지만 친절하게도 어떤 서비스가 이를 일반 사용자들이 편하고 쉽게 사용할 수 있도록 최신 자료를 별도로 업데이트하고 있다. &lt;a href=&#34;http://www.gisdeveloper.co.kr/?p=2332&#34;&gt;지오서비스&lt;/a&gt;라는 곳인데 여기서 2020년 5월 자료도 게시되어 있어 다운받아 활용하면 좋을 것 같다. ‘리’ 단위 데이터 분석도 가능하지만 우선 시각화의 용이성을 위해 ‘시군구’ 단위 데이터로 가보자. 로직은 행정구역과 상관 없이 동일하다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;SIG = readOGR(mylocation, &amp;quot;SIG&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Warning in OGRSpatialRef(dsn, layer, morphFromESRI = morphFromESRI, dumpSRS
+## = dumpSRS, : Discarded datum International_Terrestrial_Reference_Frame_2000
+## in CRS definition: +proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000
+## +y_0=2000000 +ellps=GRS80 +units=m +no_defs&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## OGR data source with driver: ESRI Shapefile 
+## Source: &amp;quot;C:\Users\chchc\Documents\blog\blog\content\posts&amp;quot;, layer: &amp;quot;SIG&amp;quot;
+## with 250 features
+## It has 3 fields&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;좌표계-변환-utm-k에서-wgs84로&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;좌표계 변환: UTM-K에서 WGS84로&lt;/h2&gt;
+&lt;p&gt;자, 그런데 여기서 까다로운 점은 지리 공간 데이터가 어떤 좌표계를 채택하고 있는지 어느 정도 이해하지 않으면 데이터 분석이 잘못되기 쉽다는 점이다. 어떤 좌표계를 선택하여 데이터를 다루든 본인 마음이지만, 데이터별로 좌표계 방식을 통일하지 않으면 거리 계산이 틀려지기 때문인 것도 이유 중 한 가지이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(result_table_3)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 6 x 4
+##   hpid     dutyName             wgs84Lon           wgs84Lat          
+##   &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;                &amp;lt;chr&amp;gt;              &amp;lt;chr&amp;gt;             
+## 1 A2200005 의료법인강릉동인병원 128.90714180258507 37.77432579461282 
+## 2 A2200011 강원도강릉의료원     128.8887963251862  37.74931042017154 
+## 3 A2200008 강릉아산병원         128.85771413305145 37.818426685036066
+## 4 A2200038 근로복지공단동해병원 129.1058560226859  37.53232311891651 
+## 5 A2200003 의료법인동해동인병원 129.1074043067605  37.530006805605616
+## 6 A2200007 강원도삼척의료원     129.16370014395005 37.44027922704624&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;result_table_3에 수집된 좌표계는 API 가이드라인에도 적혀있듯 WGS84 방식이다. 그런데 우리가 국가로부터 제공받고 이용하는 행정구역도 공간 데이터는 한국에서(만) 주로 이용하는 UTM-K 방식이기 때문에 별도의 변환이 필요하다. 불러온 SIG 데이터는 polygon 좌표를 포함한 공간 데이터와 색인(index)격의 데이터 프레임을 동시에 제공하는데 좌표계 방식은 공간 데이터에 있으므로 여기에 접근하여 좌표계를 바꿔주면 된다.&lt;/p&gt;
+&lt;p&gt;UTM-K 좌표계 방식은 &lt;a href=&#34;mailto:SIG@proj4string에&#34; class=&#34;email&#34;&gt;SIG@proj4string에&lt;/a&gt; 있는데 이를 “+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs”라고 되어 있을 것이다. 이를 변형해주는 코드는 다음과 같다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;to_crs = CRS(&amp;quot;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&amp;quot;)
+SIG_1 = spTransform(SIG, to_crs)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 공간 데이터의 polygon 좌표값 중 2차원 상의 좌표 라벨값인 labpt 항목의 위경도를 추출하여 다음 단계인 거리 계산에 활용하자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tmp_1 = SIG_1@data
+for (i in 1:nrow(tmp_1)){
+  tmp_1$x_coord[i] = parse_number(as.character(SIG_1@polygons[[i]]@labpt)[1])
+  tmp_1$y_coord[i] = parse_number(as.character(SIG_1@polygons[[i]]@labpt)[2])
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;거리 계산 후에 이 데이터는 merge() 함수로 공간 데이터에 다시 병합되어 시각화될 것이다. 이렇게 거리 계산을 위해 별도의 tmp_1 테이블을 만드는 이유는, polygon 좌표의 labpt 변수(평면상의 좌표 라벨)만 추출해서 좌표 변환하는 방식이 에러 처리가 어렵기 때문이다. raw 데이터 보존과 파일 용량을 고려하여 이 방식으로 하는 것도 좋을 것 같지만 우선 가능한 방법으로 진행한다. 물론 결과값의 차이는 없다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;거리-계산-haversine-공식-적용&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;거리 계산: Haversine 공식 적용&lt;/h2&gt;
+&lt;p&gt;우선 좌표계는 이렇게 바꿔주었고, 이제부터 우리는 프로젝트에서 중요한 태스크 중 하나인 거리 계산을 해야한다. 여기서의 거리 계산은 행정구역별 대표 좌표값과 공식 지정 응급의료기관 사이의 거리가 얼마나 되는지에 대해서인데, 본 프로젝트에서는 거리 기준(30km)을 만족한 응급의료기관의 직접 산출한 병원점수를 합산하는 방식으로 접근성을 분석/시각화했다면 여기서는 우선 거리 기준(30km)을 만족하는 응급의료기관의 갯수를 행정구역별로 계산하는 단계까지 적용해보겠다.&lt;/p&gt;
+&lt;p&gt;거리 계산 공식은 유클리디안(Euclidean) 거리 공식이 아닌 하버사인 공식을 이용한다. 단순히 말해서 &lt;strong&gt;지구가 평면이 아닌 구의 형태를 하고 있어 곡면상의 두 지점의 거리를 구하기 위할 때는 하버사인 공식이 보다 높은 정확도를 기하기 때문이다.&lt;/strong&gt; 하버사인 공식으로 거리를 계산하는 함수가 몇몇 R 패키지에 있지만, 그 중에서 필요 인자값이 우리가 가진 데이터 값과 거의 동일하여 전처리가 쉬운 geosphere 패키지의 distHaversine() 함수를 이용하기로 한다.&lt;/p&gt;
+&lt;p&gt;인자값을 얻기 위한 전처리로는 dist와 medi 두 리스트에 각각 위경도 수치를 넣어주는 것 뿐이다. dist에는 행정구역별 좌표값, medi에는 약 400개의 공식 지정 응급의료기관 좌표값이 들어간다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dist = list()
+for (i in 1:nrow(tmp_1)){
+dist[[i]] = c(tmp_1$x_coord[i], tmp_1$y_coord[i])
+}
+
+medi = list()
+for (i in 1:nrow(result_table_3)){
+  medi[[i]] = c(parse_number(result_table_3$wgs84Lon[i]), parse_number(result_table_3$wgs84Lat[i]))
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;이제 30km 이내에 도달 가능한 응급의료기관 수를 계산하자. 참고로 30km라는 기준은 정부가 응급의료분야 의료취약지를 선정하는 법적 기준인 ‘공공보건의료에 관한 법률’ 제12조 제2항 및 제3항의 지역내 30% 이상의 인구가 ’지역응급의료센터로 30분 이내 도달이 불가능한 경우’를 참고하여 설정한 기준이다. 인근 구급차가 사고 발생 지역으로 출동하여 환자에게 간이 응급처치 후 응급의료기관 위치와 수용가능현황을 파악하여 수송하는 단계를 고려했을 때 30km가 최소한의 거리라고 판단한 것이다.&lt;/p&gt;
+&lt;p&gt;다음과 같은 for문 계산이 끝나면 tmp_1 테이블의 num 변수에는 시군구별 30km 내 접근 가능 응급의료기관의 갯수가 나올 것이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# 거리 계산하여 30km 이내에 도달 가능한 응급의료기관 수 계산
+
+library(geosphere)
+
+tmp_1$num = 0
+for (i in 1:length(dist)){
+  for (j in 1:length(medi)){
+  ifelse(distHaversine(dist[[i]], medi[[j]])&amp;lt;30000, tmp_1$num[i] &amp;lt;- tmp_1$num[i]+1, next)
+  }
+}
+
+SIG_1 = sp::merge(SIG_1, tmp_1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;앞서 언급한 대로 num 변수가 산출되어 저장된 tmp_1을 공간데이터 SIG_1와 병합했다.&lt;/p&gt;
+&lt;div id=&#34;간단한-시각화-leaflet-패키지&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;간단한 시각화: leaflet 패키지&lt;/h3&gt;
+&lt;p&gt;이제 새롭게 병합한 공간 데이터로 &lt;strong&gt;leaflet 패키지&lt;/strong&gt;를 통해 시각화해보자. 시각화의 밑그림이 되어주는 지도로는 Mapbox를 사용한다. 물론 CartoDB.Positron이나 이외 지도를 사용해도 상관없다.&lt;/p&gt;
+&lt;p&gt;우선 summary(&lt;a href=&#34;mailto:SIG_1@data$num&#34; class=&#34;email&#34;&gt;SIG_1@data$num&lt;/a&gt;)를 통해 qunatile값을 확인하고 이에 맞게 색깔 부여 기준값을 정하자. 물론 스펙트럼으로 색을 설정하여 알아서 부여하도록 할 수 있다.&lt;/p&gt;
+&lt;p&gt;pal2 = colorNumeric(“viridis”, &lt;a href=&#34;mailto:SIG_1@data$num&#34; class=&#34;email&#34;&gt;SIG_1@data$num&lt;/a&gt;, reverse=TRUE)와 같은 식으로 가능하다. 그러나 명목형으로 구분하는 방식으로 해보자.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(SIG_1@data$num)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    5.00   12.50   27.85   36.75  102.00&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;labels 변수로 행정구역별 label과 해당값을 넣어주고 커서가 움직일 때 나타나는 기능까지 추가해보자. 어려워 보이지만 leaflet 패키지의 상호작용성은 생각보다 훨씬 versatile하다. 다방면으로 활용 가능해 보인다.&lt;/p&gt;
+&lt;p&gt;참고로 YlGNBU는 컬러 스펙트럼 코드 중 하나다. 노랑(Yellow)부터 초록(Green)을 지나 파랑(Blue)까지 분포하는 스펙트럼인데 붉은 계열인 ’YlOrRd’를 써도 상관 없다. 이는 나타내고자 하는 바와 어느 정도 시각적/직관적으로 호응하는지에 따라 사용하면 사용자 경험(UX)에 보다 충실할 수 있을 것이다.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(leaflet)
+
+bins = c(0, 5, 12.5, 27.85, 36.75, 73.5, Inf)
+pal = colorBin(&amp;quot;YlGnBu&amp;quot;, domain = SIG_1@data$num, bins = bins)
+
+labels &amp;lt;- sprintf(
+    &amp;quot;&amp;lt;strong&amp;gt;%s&amp;lt;/strong&amp;gt;&amp;lt;br/&amp;gt;%g points&amp;quot;,
+    SIG_1@data$SIG_ENG_NM, SIG_1@data$num
+) %&amp;gt;% lapply(htmltools::HTML)
+
+leaflet(SIG_1) %&amp;gt;%
+            setView(lng=127.7669,lat=35.90776, zoom=7.5) %&amp;gt;%
+            addProviderTiles(&amp;quot;MapBox&amp;quot;, options = providerTileOptions(
+                id = &amp;quot;mapbox.light&amp;quot;,
+                accessToken = Sys.getenv(&amp;#39;MAPBOX_ACCESS_TOKEN&amp;#39;))) %&amp;gt;%
+            addPolygons(color=&amp;#39;#444444&amp;#39;, 
+                        weight=2, opacity = 1.0, fillOpacity = 0.5, 
+                        fillColor=~pal(num),
+                        label = labels,
+                        labelOptions = labelOptions(
+                            style = list(&amp;quot;font-weight&amp;quot; = &amp;quot;normal&amp;quot;, padding = &amp;quot;3px 8px&amp;quot;),
+                            textsize = &amp;quot;15px&amp;quot;,
+                            direction = &amp;quot;auto&amp;quot;)) %&amp;gt;%
+            addLegend(pal = pal, values = ~num, opacity = 0.7, title = &amp;quot;Emergency Score&amp;quot;,
+                      position = &amp;quot;bottomright&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;style&gt;
+body {
+  font-family: NanumGothic;
+  fontsize = 8px
+}
+&lt;/style&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+       </item>
+       
+     </channel>
+   </rss>

@@ -1,8 +1,8 @@
 baseurl = "/"
 title = "Joahn-lab"
-copyright = "Copyright &copy; 2019 - Author Name"
+copyright = "Copyright &copy; 2019 - Joahn"
 canonifyurls = true
-theme = "indigo"
+theme = "hugo-kiera"
 
 paginate = 3
 summaryLength = 30
@@ -11,15 +11,14 @@ pygmentsCodeFences = true
 
 [author]
     name = ""
-    github = "funkydan2"
+    github = "joahn-lab"
     gitlab = ""
     linkedin = ""
     facebook = ""
-    twitter = "ds_says"
-    instagram = ""
+    instagram = "babyblu_deepdown"
 
 [params]
-    tagline = "A Hugo theme for creative and technical writing"
+    tagline = "All we want is around us"
     
     # options for highlight.js (version, additional languages, and theme)
     # path to the favicon, under "static"

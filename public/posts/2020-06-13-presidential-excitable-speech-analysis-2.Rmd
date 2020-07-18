@@ -31,7 +31,7 @@ categories: []
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-setwd("C:/Users/Byeongjun Cho/Documents/blog/blog/content/posts")
+setwd("C:/Users/chchc/Documents/blog/blog/content/posts")
 library(tidyverse)
 library(lubridate)
 library(plyr)
