@@ -22,12 +22,12 @@
 
 &lt;div id=&#34;customer-satisfaction-data-analysis-in-us-airline-services&#34; class=&#34;section level3&#34;&gt;
 &lt;h3&gt;Customer Satisfaction Data Analysis in US Airline Services&lt;/h3&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Table of contents
-Abstract
-1. Motivation
-2. Data explanation
-3. Analysis
+&lt;p&gt;Table of contents&lt;/p&gt;
+&lt;p&gt;Abstract&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Motivation&lt;/li&gt;
+&lt;li&gt;Data explanation&lt;/li&gt;
+&lt;li&gt;Analysis
 3.1. Data exploration
 3.1.1 Correlation coefficient
 3.1.2. Simple linear regression
@@ -36,12 +36,12 @@ Abstract
 3.2.2. Likert-scale factors on satisfaction
 3.3. Classification modelling
 3.3.1. Tree model / RP, CI tree and Random forest models
-3.3.2 Logistic regression model
-4. Conclusion (omitted)
+3.3.2 Logistic regression model&lt;/li&gt;
+&lt;li&gt;Conclusion (omitted)
 4.1. Algorithm recommendations (omitted)
 4.2. Practical conclusion (omitted)
-*References&lt;/p&gt;
-&lt;/blockquote&gt;
+*References&lt;/li&gt;
+&lt;/ol&gt;
 &lt;hr /&gt;
 &lt;div id=&#34;abstract&#34; class=&#34;section level4&#34;&gt;
 &lt;h4&gt;Abstract&lt;/h4&gt;
@@ -948,10 +948,8 @@ table(predictions, testset.lr$manual_l)&lt;/code&gt;&lt;/pre&gt;
 ##        &amp;#39;Positive&amp;#39; Class : FALSE           
 ## &lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# find the best cut-off
-sf.roc=roc(testset.lr$manual_l, pred)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## Setting levels: control = FALSE, case = TRUE&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## Setting direction: controls &amp;gt; cases&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;plot(sf.roc)&lt;/code&gt;&lt;/pre&gt;
+sf.roc=roc(testset.lr$manual_l, pred)
+plot(sf.roc)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;coords(sf.roc, &amp;quot;best&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Warning in coords.roc(sf.roc, &amp;quot;best&amp;quot;): The &amp;#39;transpose&amp;#39; argument to FALSE
@@ -967,6 +965,11 @@ The best cut-off in both sensitivity and specificity is 0.610, and the best resu
 &lt;h6&gt;*References&lt;/h6&gt;
 &lt;p&gt;&lt;a href=&#34;https://www.cnbc.com/2019/05/28/consumer-satisfaction-soars-to-record-high-in-airline-travel-survey.html&#34;&gt;Consumer satisfaction in the skies soars to record high in annual airline travel survey (2019.05.29)&lt;/a&gt;
 &lt;a href=&#34;https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html&#34;&gt;US airline stocks tumble after Buffett sells stakes (2020.05.04)&lt;/a&gt;&lt;/p&gt;
+&lt;style&gt;
+body {
+  fontsize = 8px
+}
+&lt;/style&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;

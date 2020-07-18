@@ -25,9 +25,10 @@ library(readxl)
 
 ### Customer Satisfaction Data Analysis in US Airline Services
 
->
 Table of contents
+
 Abstract
+
 1. Motivation
 2. Data explanation
 3. Analysis
@@ -348,7 +349,7 @@ table(predictions, testset.lr$manual_l)
 confusionMatrix(table(predictions, testset.lr$manual_l))
 ```
 
-```{r}
+```{r, message=FALSE}
 # find the best cut-off
 sf.roc=roc(testset.lr$manual_l, pred)
 plot(sf.roc)
@@ -362,3 +363,9 @@ The best cut-off in both sensitivity and specificity is 0.610, and the best resu
 
 [Consumer satisfaction in the skies soars to record high in annual airline travel survey (2019.05.29)](https://www.cnbc.com/2019/05/28/consumer-satisfaction-soars-to-record-high-in-airline-travel-survey.html)
 [US airline stocks tumble after Buffett sells stakes (2020.05.04)](https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html)
+
+<style>
+body {
+  fontsize = 8px
+}
+</style>

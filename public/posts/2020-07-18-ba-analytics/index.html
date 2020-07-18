@@ -101,12 +101,12 @@
 
 <div id="customer-satisfaction-data-analysis-in-us-airline-services" class="section level3">
 <h3>Customer Satisfaction Data Analysis in US Airline Services</h3>
-<blockquote>
-<p>Table of contents
-Abstract
-1. Motivation
-2. Data explanation
-3. Analysis
+<p>Table of contents</p>
+<p>Abstract</p>
+<ol style="list-style-type: decimal">
+<li>Motivation</li>
+<li>Data explanation</li>
+<li>Analysis
 3.1. Data exploration
 3.1.1 Correlation coefficient
 3.1.2. Simple linear regression
@@ -115,12 +115,12 @@ Abstract
 3.2.2. Likert-scale factors on satisfaction
 3.3. Classification modelling
 3.3.1. Tree model / RP, CI tree and Random forest models
-3.3.2 Logistic regression model
-4. Conclusion (omitted)
+3.3.2 Logistic regression model</li>
+<li>Conclusion (omitted)
 4.1. Algorithm recommendations (omitted)
 4.2. Practical conclusion (omitted)
-*References</p>
-</blockquote>
+*References</li>
+</ol>
 <hr />
 <div id="abstract" class="section level4">
 <h4>Abstract</h4>
@@ -1027,10 +1027,8 @@ table(predictions, testset.lr$manual_l)</code></pre>
 ##        &#39;Positive&#39; Class : FALSE           
 ## </code></pre>
 <pre class="r"><code># find the best cut-off
-sf.roc=roc(testset.lr$manual_l, pred)</code></pre>
-<pre><code>## Setting levels: control = FALSE, case = TRUE</code></pre>
-<pre><code>## Setting direction: controls &gt; cases</code></pre>
-<pre class="r"><code>plot(sf.roc)</code></pre>
+sf.roc=roc(testset.lr$manual_l, pred)
+plot(sf.roc)</code></pre>
 <p><img src="/posts/2020-07-18-BA-analytics_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <pre class="r"><code>coords(sf.roc, &quot;best&quot;)</code></pre>
 <pre><code>## Warning in coords.roc(sf.roc, &quot;best&quot;): The &#39;transpose&#39; argument to FALSE
@@ -1046,6 +1044,11 @@ The best cut-off in both sensitivity and specificity is 0.610, and the best resu
 <h6>*References</h6>
 <p><a href="https://www.cnbc.com/2019/05/28/consumer-satisfaction-soars-to-record-high-in-airline-travel-survey.html">Consumer satisfaction in the skies soars to record high in annual airline travel survey (2019.05.29)</a>
 <a href="https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html">US airline stocks tumble after Buffett sells stakes (2020.05.04)</a></p>
+<style>
+body {
+  fontsize = 8px
+}
+</style>
 </div>
 </div>
 </div>
