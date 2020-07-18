@@ -1,0 +1,364 @@
+---
+title: "BA Analytics report"
+author: "joahn lab"
+date: '2020-07-18'
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float : yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+library(C50)
+library(modeldata)
+library(party)
+library(caret)
+library(e1071)
+library(randomForest)
+library(pROC)
+library(readxl)
+```
+
+### Customer Satisfaction Data Analysis in US Airline Services
+
+>
+Table of contents
+Abstract
+1. Motivation
+2. Data explanation
+3. Analysis
+    3.1. Data exploration
+        3.1.1 Correlation coefficient
+        3.1.2. Simple linear regression
+    3.2. Data visualization
+        3.2.1. Non-Likert-scale factors on satisfaction
+        3.2.2. Likert-scale factors on satisfaction
+    3.3. Classification modelling
+        3.3.1. Tree model / RP, CI tree and Random forest models
+        3.3.2 Logistic regression model
+4. Conclusion (omitted)
+    4.1. Algorithm recommendations (omitted)
+    4.2. Practical conclusion (omitted)
+        *References
+        
+* * *
+
+#### Abstract
+
+With the development of the aviation industry in recent years, there has been surging needs for business analysis about customer convenience in flights, especially in the US. But the bottom line is within a year after this high reputation, in the crisis of this worldwide COVID-19 outbreak, all the airline services and the whole industry got a huge damage on their own businesses due to every country’s current travel restrictions and social distancing policies.
+So, what we have decided is to analyze how we can suggest to make airlines perform in a quite competitive manner. How will they fly again to risk this situation and attract their customers who want their needs to be satisfied? We analyzed the US airlines customer satisfaction dataset in several ways, following EDA, visualizations with ggplot(), and classification modelling to get more sense of satisfaction analysis. We want to help make breakthroughs now of crisis for airlines by harnessing the analysis skills we’ve learned from this class.
+
+#### 1. Motivation
+
+With the development of the aviation industry in recent years, there has been surging needs for business analysis about customer convenience in flights, especially in the US. According to an article called “Consumer satisfaction in the skies soars to record high in annual airline travel survey” published in CNBC last year, “2019 North American Airline Satisfaction Survey shows travelers gave the industry a record-high score, with the biggest improvements coming from so-called legacy carriers.” It is strongly sure that this improvement about proficiency in customer service has helped airlines record high sales.
+But the bottom line is within a year after this high reputation, in the crisis of this worldwide COVID-19 outbreak, all the airline services and the whole industry got a huge damage on their own businesses due to every country’s current travel restrictions and social distancing policies. As a matter of fact, [“Warren Buffett said Berkshire Hathaway sold its entire stakes in the four largest U.S. carriers as coronavirus devastates travel demand.”](https://www.cnbc.com/quotes/?symbol=BRK.A) last month. The four, which are well-known as four major airlines in US flight industries, “American”, “Delta”, “United”, “Southwest”, [“had posted their first quarterly losses in years, and warned of a slow recovery in demand from pre-pandemic levels. Even the CEO of Delta airlines said it could take 2 to 3 years from now.”](https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html) And not surprisingly, carriers in South Korea suffer the similar situation in industry and businesses.
+So, what we have decided is to analyze how we can suggest to make airlines perform in a quite competitive manner. How will they fly again to risk this situation and attract their customers who want their needs to be satisfied? And moreover, how can this strategy be coordinated with the country's travel restrictions and social distancing? We wanted to help make breakthroughs now of crisis for airlines by harnessing the analysis skills we’ve learned from this class.
+
+#### 2. Data Explanation
+
+Our dataset for analysis on the research paper is posted in Kaggle, this dataset deals with US airlines satisfaction survey, and contains 24 columns in about 130000 observations. Short descriptions about 24 columns provided by [the publisher of this dataset in Kaggle](https://www.kaggle.com/johndddddd/customer-satisfaction), are as follows in the table.
+
+```{r}
+sf = read_xlsx("satisfaction.xlsx")
+sf
+```
+
+As suggested, out of 24 variables, 4 are continuous, 5 are nominal, and 14 are ordinal variables. And we should notice that these ordinal variables include 0, which means NA value out of scale of 1-5, to make sense of preprocessing NA values further. Basically, there has demographic information such as ‘Age’ and ‘Gender’. Moreover, customer type, class (of seats) and flight distance are noted, and additive information about flight delay is also suggested. Most importantly, ‘satisfaction_v2’ summarizes the overall satisfaction by customers who answered this questionnaire. We can guess that there might be correlation between this comprehensive variable and the other service evaluations variables.
+
+#### 3. Data Analysis
+
+##### 3.1. Data exploration
+
+Let’s get down to summarizing our dataset with skimr::skim() function, which has a better performance than summary() function does.
+
+```{r}
+skimr::skim(sf)
+```
+
+In this skim result, this dataset has similar shapes with normal distribution in ages and flight distances. Moreover, many of the respective satisfaction items have 3-4 in mean values, which implies that customers in general are satisfied with airline services overall. Because 5 Likert-scale variables do not count zero as applicable, there are no NA values instead, except for ‘Departure/Arrival delay in minutes’ concerned with special events like delay.
+
+###### 3.1.1. Correlation coefficient
+
+It is better to remain 0 values in 5 Likert-scale variables, rather than changing them with NA. It is because we cannot run correlation tests with numeric variables which have NA values. So, we didn’t consider preprocessing them.
+The coefficient tables with Pearson correlation tests are as follows.
+
+```{r}
+sf.num = sf %>% mutate(Satisfied_num = ifelse(satisfaction_v2 == 'satisfied', 1, 0), Class_num = case_when(Class == 'Eco' ~ 0, Class == 'Eco Plus' ~ 1, Class == 'Business' ~ 2), Type_num = case_when(`Type of Travel` == 'Personal Travel' ~ 0, `Type of Travel` == 'Business travel' ~ 1), Loyal_num = ifelse(`Customer Type` == 'Loyal Customer', 1, 0))
+sf.num = sf.num[, sapply(sf.num, is.numeric)]
+
+corrplot::corrplot(cor(sf.num), method = "shade")
+```
+
+To make correlation tests possible, we had to make variables countable, that is, numeric. Shortly, we converted character variables such as ‘satisfaction_v2’, ‘Type of Travel’, ‘Customer Type’ and ‘Class’ into numeric which are counted on our own. This plot is supposed to be made to get a better understanding regarding the relationship between variables, allowing us to make numeric labels on our own. We counted ‘Eco’ seats, ‘Personal Travel’, ‘disloyal customers’, and ‘neutral or dissatisfied’ with 0, and 1 or 2 with vice versa.
+Through correlation plot, there seems to be some positive relationship from ‘Seat comfort’ to ‘Gate location’, and from ‘Inflight wifi service’ to ‘Online boarding’. Besides, there seems positive correlation between converted variables. On top of that, regarding ‘Satisfied_num’ which stands for the most comprehensive variable, many of 5 Likert-scale variables seem to have some positive correlations with this variable. So, we can closely look into these parts further.
+
+###### 3.1.2. Simple linear regression
+
+With a simple linear regression test with lm() and tidy(), which summarizes the test in tibble, the result is as follows. The dependent variable is a dummy value labelled ‘Satisfied_num’, which counts 1 with ‘satisfied’ response, and 0 with ‘neutral or dissatisfied’ response.
+
+```{R}
+lm(Satisfied_num~., data = sf.num[,c(2:17, 20)]) %>% broom::tidy()
+```
+
+```{r}
+boxplot(Age~satisfaction_v2, data = sf, col = "sky blue", border= "purple")
+boxplot(sf$`Inflight wifi service`~sf$satisfaction_v2, data = sf, col = "sky blue", border= "purple")
+```
+
+With this simple test, we confirmed significance between overall satisfaction and respective items for airline services. However, we cannot assert a simple linear relationship between them with ease. That is, though we might find them relatable in some senses due to lots of accountable variables in models, we should note that the positive/negative relationships suggested above are not necessarily true.
+For instance, in the simple lm() model, it is suggested that Age has a negative influence on ‘Satisfied_num’, and even satisfaction on ‘Inflight wifi service’ does too. However, in the boxplots, we may notice more increase both for two numeric variables in satisfied groups than in neutral/dissatisfied groups. Therefore, it would be only enough to conclude that there is an overall positive statistical significance in respective satisfaction items on ‘Satisfied_num’, and a slightly negative significance in ‘Personal travel’, ‘Economy class’, ‘long-distance journey’ groups.
+
+##### 3.2. Data visualization
+
+With EDA above, we found some interesting insights on this dataset. Now we want to articulate these tendencies into ggplot graphs with sophisticated visualizations. What we want here is to make clear which factors ‘satisfaction _v2’, key value in this dataset which stands for customer satisfaction, has much to do with.
+Here are checklists we would like to confirm, based on some interesting insights suggested above in the last part.
+
+###### 3.2.1. Non-likert scale factors on satisfaction
+
+We already saw that ‘Type of Travel’, ‘Flight distances’ and ‘Customer Type’ has to do with overall satisfaction variables. Therefore, we may look closely at these relationships with geom_bar() and geom_histogram().
+
+###### (a) Type of travel/Customer type on satisfaction
+
+```{R}
+sf %>%
+  ggplot(aes(x = `Type of Travel`, fill = satisfaction_v2)) +
+  geom_bar(aes(x = `Type of Travel`))+
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))
+```
+
+As you see above, Business travelers have satisfied more than personal travels have, and we can easily see the proportional differences in color between two groups.
+
+```{R}
+sf %>%
+  ggplot(aes(fill = satisfaction_v2)) +
+  geom_bar(aes(x = `Customer Type`)) +
+  theme_bw() +
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))
+```
+
+In this graph, although we notice that there are much more loyal customers counted, it is reported that loyal customers tend to be much more satisfied with overall services than their counterparts.
+
+###### (b) Flight distances on satisfaction
+
+```{r}
+sf %>%
+  ggplot(aes(x = `Flight Distance`, fill = satisfaction_v2)) +
+  geom_histogram() +
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))
+```
+
+In this histogram suggesting counts on continuous flight distances, we find that only from 1000 to 3000km long, where most customers are covered, satisfaction level is similar with each other while customers are likely to report satisfaction in other ranges. Therefore, it is hard to simply suggest a linear relationship between flight distances and overall satisfaction.
+
+###### 3.2.2. Likert-scale factors on satisfaction
+
+We will focus on two Likert-scale factors, which were reported to have a negative relationship with overall satisfaction. It does not make sense to general thinking, and after looking at the graph we made, we will decide if it is better to get rid of these variables out of model.
+
+```{r}
+sf %>%
+  ggplot(aes(x = `Food and drink`, fill = satisfaction_v2)) +
+  geom_histogram() +
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))
+```
+
+The first one is ‘Food and drink’ satisfaction item. There is a slight increase in proportion of ‘satisfied’ customers in 4-5 point. However, we couldn’t see a clear estimate in EDA, due to 1-3 points where there is no increase in proportion of ‘satisfied’ customers. We can guess as ‘food and drink’ is available at such level, people don’t much care about this item. But since this variable doesn’t seem to harm classification modelling, we can keep that in later models.
+
+```{r}
+sf %>%
+  ggplot(aes(x = `Departure/Arrival time convenient`, fill = satisfaction_v2)) +
+  geom_histogram() +
+  theme_bw()+
+  theme(axis.title.x = element_text(size = 15), 
+        axis.text = element_text(size = 15),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 13))
+```
+
+The second one is ‘Departure/Arrival time convenient’ variable. There shows a similar tendency as ‘Food and drink’. It means that, if they are not so bothered with inconvenience of unpunctuality, they don’t find this variable as important for their satisfaction. However, there is a slight and positive tendency as we see on the graph, which might help classify ‘satisfied’ customers in later models. So, we can keep these two Likert-scale variables.
+
+##### 3.3. Classification modelling
+
+We’ve run classification models which we’ve learned in this course and thought to be proper in this dataset, giving random index with set.seeds(1234) to split train set/test set with probability of 0.7/0.3. And first, here is a simple summary table with sensitivity/specificity and accuracy estimates on each model.
+
+* * * 
+RP Tree
+Accuracy: 0.8649
+Sensitivity/Specificity : 0.8584/0.8703
+CI Tree
+Accuracy: 0.9399
+Sensitivity/Specificity : 0.9393/0.9404
+Random forest
+Accuracy: 0.9564
+Sensitivity/Specificity : 0.9608/0.9527
+Logistic regression
+Accuracy: 0.8339
+Sensitivity/Specificity : (best cut-off; 0.610/ 0.8/0.88) 0.8496/0.8151
+Naïve Bayes
+Accuracy : 0.8103
+Sensitivity/Specificity :0.7728/0.8416
+* * *
+
+With these 5 models above, ‘Random forest’ classification model showed the best proficiency in accuracy in this case, while Naive Bayes showed the least. All these variables in the model are correlated, not independent each other as presumed in Naive Bayes theory. Now let’s look at the short analysis in each model, except for Naive Bayes model which showed the least proficiency to predict proper satisfaction.
+
+###### 3.3.1. Tree model / RP, CI tree and Random forest models
+
+```{r}
+##########
+# RP tree
+##########
+
+set.seed(1234) # I checked for 3 seeds, '1234', '1000', '4321'
+index = sample(2, nrow(sf), replace = TRUE, prob = c(0.7, 0.3))
+trainset = sf[index==1,]
+testset = sf[index==2,]
+dim(trainset)
+dim(testset)
+
+sf.rp = rpart::rpart(satisfaction_v2~., data = trainset)
+sf.rp
+plot(sf.rp, uniform=TRUE, branch=0.1, margin=0.1)
+text(sf.rp, all=TRUE, use.n=TRUE)
+```
+
+As the plot above in RP tree model suggests, the survey factor which mainly classifies the overall satisfaction was ‘Inflight entertainment’, which we saw the highest coefficient estimate in simple linear regression model. Additionally, we found that there are 5-6 Likert-scale factors mainly included in decision tree.
+
+```{r}
+predictions = predict(sf.rp, testset, type="class")
+table(predictions, testset$satisfaction_v2)
+confusionMatrix(table(predictions, testset$satisfaction_v2))
+```
+
+```{r}
+rpart::plotcp(sf.rp)
+```
+
+This is the result graph on plotcp(). We saw that this RP tree showed the least X-Error on Y axis, when separated with 7 groups. That’s why there are only 6 main variables in our RP tree model. However, we can go further with CI tree model after converting some character variables into factor variables to apply this model. As suggested above the table, CI tree show high accuracy over .9 and well-balanced sensitivity/specificity for each, without any further pruning process since this method uses significance to prune the tree.
+
+```{r}
+##########
+# CI tree
+##########
+
+# Pre-processing before prdictions
+
+sf$satisfaction_v2 = as.factor(sf$satisfaction_v2)
+sf$Gender= as.factor(sf$Gender)
+sf$`Customer Type` = as.factor(sf$`Customer Type`)
+sf$`Type of Travel` = as.factor(sf$`Type of Travel`)
+sf$Class = as.factor(sf$Class)
+
+sf.name = sf %>% colnames() %>% str_replace_all(" ","")
+sf.df.name = sf %>% setNames(sf.name)
+
+trainset.ci = sf[index==1,]
+testset.ci = sf[index==2,]
+
+sf.ci = ctree(satisfaction_v2 ~ ., data=trainset.ci)
+# sf.ci
+# plot(sf.ci)
+
+predictions = predict(sf.ci, testset.ci)
+table(predictions, testset.ci$satisfaction_v2)
+confusionMatrix(table(predictions, testset.ci$satisfaction_v2))
+```
+
+```{r}
+##########
+# Random Forest
+##########
+
+sf = sf[,2:22]
+sf.name = sf %>% colnames() %>% str_replace_all(" ","")
+sf.df.name = sf %>% setNames(sf.name)
+
+trainset.rf = sf.df.name[index==1,]
+testset.rf = sf.df.name[index==2,]
+
+sf.rf = randomForest(satisfaction_v2 ~ Gender+CustomerType+Age+TypeofTravel+Class+FlightDistance+Seatcomfort+Foodanddrink+Gatelocation+Inflightwifiservice+Inflightentertainment+Onlinesupport+EaseofOnlinebooking+Legroomservice+Baggagehandling+Checkinservice+Cleanliness+Onlineboarding, data=trainset.rf, mtry = 4,importance=T)
+
+sf.rf
+importance(sf.rf)
+
+predictions = predict(sf.rf, testset.rf)
+table(predictions, testset.rf$satisfaction_v2)
+confusionMatrix(table(predictions, testset.rf$satisfaction_v2))
+```
+
+On top of that, we saw the random forest model, well-known as ensemble learning which harnesses ‘bagging’ to fix the errors in other decision trees, shows the best proficiency in predicting the overall customer satisfaction variable. Moreover, we can sophisticate this model with changing parameters in the randomforest() function, such as ntree and mtry. The only thing concerned with this model is computing time, though this doesn’t make differences in proficiency of this model.
+We ran for loop to calculate the best parameters in random forest. And with ntree of 500 and mtry of 5, this model showed the highest accuracy of .9572 in prediction.
+
+```{r, eval=FALSE}
+ntree = c(400, 500, 600)
+mtry = c(3:5)
+param = data.frame(n = ntree, m = mtry)
+
+for (i in param$n){
+  cat('ntree=', i, '\n')
+  for (j in param$m){
+    cat('mtry')
+    model_sf = randomForest(satisfaction_v2~Gender+CustomerType+Age+TypeofTravel+Class+FlightDistance+Seatcomfort+Foodanddrink+Gatelocation+Inflightwifiservice+Inflightentertainment+Onlinesupport+EaseofOnlinebooking+Legroomservice+Baggagehandling+Checkinservice+Cleanliness+Onlineboarding, data=trainset.rf, ntree = i, mtry = j,importance=T)
+
+predictions.1 = predict(model_sf, testset.rf)
+table(predictions.1, testset.rf$satisfaction_v2)
+confusionMatrix(table(predictions.1, testset.rf$satisfaction_v2))
+  }
+}
+```
+
+###### 3.2.2. Logistic regression model
+
+```{r}
+##########
+# Logistic regrssion
+##########
+
+sf.lr = sf %>%
+  mutate(satisfaction_v2 = ifelse(satisfaction_v2 == 'satisfied', 1, 0))
+
+trainset.lr = sf.lr[index==1,]
+testset.lr = sf.lr[index==2,]
+
+fit = glm(satisfaction_v2 ~ ., data=trainset.lr, family=binomial)
+summary(fit)
+
+pred = predict(fit, testset, type="response")
+predictions = (pred <.5)
+
+table(predictions, testset.lr$satisfaction_v2)
+testset.lr$manual_l=ifelse(testset.lr$satisfaction_v2==1, FALSE, TRUE)
+table(predictions, testset.lr$manual_l)
+confusionMatrix(table(predictions, testset.lr$manual_l))
+```
+
+```{r}
+# find the best cut-off
+sf.roc=roc(testset.lr$manual_l, pred)
+plot(sf.roc)
+coords(sf.roc, "best")
+```
+
+And, here is the threshold graph for the best cut-off in logistic regression model. We also ran for logistic regression model, which is good to set the best cut-off for sensitivity/specificity. For running, we should pre-process the ‘satisfaction_v2’ with making it as a numeric variable, because this model assumes a binomial family in Y value.
+The best cut-off in both sensitivity and specificity is 0.610, and the best result is 0.8/0.88 for each. Plus, with that, we should notice these are in fact reversed estimates, because we should assume that the actual positive value is ‘neutral/dissatisfied’, which should be more accurately predicted to improve customer services of US airlines.
+
+###### *References
+
+[Consumer satisfaction in the skies soars to record high in annual airline travel survey (2019.05.29)](https://www.cnbc.com/2019/05/28/consumer-satisfaction-soars-to-record-high-in-airline-travel-survey.html)
+[US airline stocks tumble after Buffett sells stakes (2020.05.04)](https://www.cnbc.com/2020/05/04/us-airline-stocks-tumble-after-buffett-sells-whole-stakes.html)
