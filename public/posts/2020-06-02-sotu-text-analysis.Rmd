@@ -24,7 +24,7 @@ list.files()
 ```
 
 ```{r}
-stu = read.csv("STU_address_metadata.csv",header=T) %>% as_tibble()
+stu = read.csv("STU_address_metadata.csv", header=T, encoding = 'UTF-8') %>% as_tibble()
 head(stu)
 ```
 

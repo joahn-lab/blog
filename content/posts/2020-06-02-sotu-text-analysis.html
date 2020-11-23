@@ -6,6 +6,8 @@ slug: sotu-text-analysis
 output: html_document
 ---
 
+<link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
 
 <div id="도입" class="section level2">
@@ -20,17 +22,29 @@ library(tidytext)
 library(tm)
 library(quanteda)</code></pre>
 <pre class="r"><code>list.files()</code></pre>
-<pre class="r"><code>stu = read.csv(&quot;STU_address_metadata.csv&quot;,header=T) %&gt;% as_tibble()
-head(stu)</code></pre>
+<pre class="r"><code>stu = read_csv(&quot;STU_address_metadata.csv&quot;) %&gt;% as_tibble()</code></pre>
+<pre><code>## 
+## ─ Column specification ────────────────────────────
+## cols(
+##   label = col_character(),
+##   href = col_character(),
+##   president = col_character(),
+##   president_no = col_character(),
+##   years = col_character(),
+##   title = col_character(),
+##   date = col_character(),
+##   doc_id = col_double()
+## )</code></pre>
+<pre class="r"><code>head(stu)</code></pre>
 <pre><code>## # A tibble: 6 x 8
 ##   label href           president  president_no years  title        date   doc_id
-##   &lt;fct&gt; &lt;fct&gt;          &lt;fct&gt;      &lt;fct&gt;        &lt;fct&gt;  &lt;fct&gt;        &lt;fct&gt;   &lt;int&gt;
-## 1 2017  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      1
-## 2 2018  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Janua~      2
-## 3 2019  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      3
-## 4 2020  https://www.p~ Donald J.~ 45th         2017 ~ Address Bef~ Febru~      4
-## 5 2013  https://www.p~ Barack Ob~ 44th         2009 ~ Address Bef~ Febru~      5
-## 6 2014  https://www.p~ Barack Ob~ 44th         2009 ~ Address Bef~ Janua~      6</code></pre>
+##   &lt;chr&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;        &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;   &lt;dbl&gt;
+## 1 2017  https://www.p… Donald J.… 45th         2017 … Address Bef… Febru…      1
+## 2 2018  https://www.p… Donald J.… 45th         2017 … Address Bef… Janua…      2
+## 3 2019  https://www.p… Donald J.… 45th         2017 … Address Bef… Febru…      3
+## 4 2020  https://www.p… Donald J.… 45th         2017 … Address Bef… Febru…      4
+## 5 2013  https://www.p… Barack Ob… 44th         2009 … Address Bef… Febru…      5
+## 6 2014  https://www.p… Barack Ob… 44th         2009 … Address Bef… Janua…      6</code></pre>
 <p>이번 텍스트 데이터 전처리는 tidytext 패키지의 unnest_tokens() 함수를 이용한다. 연설문 텍스트 파일을 tibble 형태로 불러온 후, 연결된 문장을 단어별로 구획해보자.</p>
 <pre class="r"><code>doc_1 = read_lines(&quot;doc_1.txt&quot;) %&gt;% as_tibble() %&gt;% 
   unnest_tokens(words, value, token=&quot;words&quot;)
@@ -120,7 +134,7 @@ A2 = inner_join(A1, tmp_2, c(&quot;n&quot;=&quot;...1&quot;)) %&gt;% unique()
 head(A2)</code></pre>
 <pre><code>## # A tibble: 6 x 9
 ##   president       doc_id president_no     n  ...2  ...3  ...4  ...5  ...6
-##   &lt;fct&gt;            &lt;int&gt; &lt;fct&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+##   &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
 ## 1 Donald J. Trump      1 45th          5096    54   237    29    29    60
 ## 2 Donald J. Trump      2 45th          5926    51   253    52    62    80
 ## 3 Donald J. Trump      3 45th          5798    63   230    47    42    47
@@ -152,7 +166,7 @@ A2_2 = A2_2[-22,]</code></pre>
   rename(&quot;president&quot; = ...1, &quot;totalwords&quot; = ...2, &quot;I&quot; = ...3, &quot;we&quot; = ...4, &quot;you&quot; = ...5, &quot;he/she&quot; = ...6,          &quot;they&quot; = ...7)</code></pre>
 <pre><code>## # A tibble: 41 x 8
 ##    president         totalwords     I    we   you `he/she`  they  rown
-##    &lt;fct&gt;                  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+##    &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
 ##  1 George Washington       2082 1.04   1.25  0.83     0.17  1.18    41
 ##  2 John Adams              1789 0.9    1.81  0.56     0.31  1.16    40
 ##  3 Thomas Jefferson        2584 0.47   2.4   0.53     0.2   1.77    39
@@ -163,7 +177,7 @@ A2_2 = A2_2[-22,]</code></pre>
 ##  8 Martin van Buren       11365 0.56   0.83  0.23     0.16  1.34    34
 ##  9 John Tyler              8517 0.570  0.73  0.32     0.45  0.75    33
 ## 10 James K. Polk          18054 0.39   1.28  0.12     0.84  1.25    32
-## # ... with 31 more rows</code></pre>
+## # … with 31 more rows</code></pre>
 </div>
 <div id="시각화" class="section level2">
 <h2>시각화</h2>
