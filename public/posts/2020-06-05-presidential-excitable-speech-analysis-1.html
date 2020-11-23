@@ -1,102 +1,13 @@
-<!doctype html>
+---
+title: "Presidential excitable speech analysis (1)"
+author: "joahn"
+date: '2020-06-05'
+slug: presidential-excitable-speech-analysis_1
+output: html_document
+tags: []
+categories: []
+---
 
-<html lang="en">
-
-<head>
-  <title>Joahn-lab</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="The HTML5 Herald" />
-  <meta name="author" content="joahn" /><meta name="generator" content="Hugo 0.78.2" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
-  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
-  <link rel="stylesheet" type="text/css" href="/css/styles.css" /></head>
-
-<body>
-  <div id="container">
-    <header>
-      <h1>
-                <a href="/">Joahn-lab</a>
-            </h1>
-
-      <ul id="social-media">
-        
-        
-          
-        <li><a href="https://github.com/joahn-lab"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
-           
-        <li><a href="https://instagram.com/babyblu_deepdown"><i class="fab fa-instagram fa-lg" aria-hidden="true"></i></a></li>
-        
-      </ul>
-      
-      <p><em>All we want is around us</em></p>
-      
-    </header>
-
-    
-<nav>
-    <ul>
-        
-        <li>
-            <a class="" href="/posts/">
-                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="/resume/">
-                <i class="fa-li fa  fa-lg"></i><span>Resume</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="/about/">
-                <i class="fa-li fa  fa-lg"></i><span>About</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="https://github.com/joahn-lab">
-                <i class="fa-li fa  fa-lg"></i><span>GitHub</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="https://instagram.com/babyblu_deepdown">
-                <i class="fa-li fa  fa-lg"></i><span>Instagram</span>
-            </a>
-        </li>
-        
-    </ul>
-</nav>
-
-    <main>
-
-
-
-
-<article>
-
-    <h1>Presidential excitable speech analysis (1)</h1>
-
-    
-        <aside>
-    <ul>
-        <li>
-            <time class="post-date" datetime="2020-06-05T00:00:00Z">Jun 5, 2020</time>
-        </li>
-        
-
-        
-
-        <li>14 minutes read</li>
-    </ul>
-</aside>
-
-    
-
-    
 <link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
 <script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
@@ -174,7 +85,7 @@ wiki = read_xlsx(&quot;wiki_president.xlsx&quot;)</code></pre>
 <pre class="r"><code>par(mfrow=c(2,1))
 plot.ts(wiki$gallup)
 plot.ts(wiki$rlmeter)</code></pre>
-<p><img src="/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/visual-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/visual-1.png" width="672" /></p>
 <p>위키백과 항목의 결측값 탓에 푹 꺼진 부분을 제외하고 대강의 추세를 살펴보면, 지난 약 2년여간 대통령의 지지율은 꾸준히 감소해왔음을 알 수 있다. 이는 집권 중반기를 지난 탓에 통상적인 레임덕 현상이 나타났음으로 보이며, 다만 코로나 사태에 대해 성공적인 국정 운영으로 평가받는 최근에 들어서는 지지율이 다소 상승한 추세를 확인할 수 있다.</p>
 </div>
 <div id="문재앙-지수-만들기-1-댓글-크롤링" class="section level2">
@@ -359,7 +270,7 @@ for (j in 1:length(linklist)){
   theme_bw()+
   geom_smooth(method = &quot;loess&quot;)</code></pre>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
-<p><img src="/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/ggplot-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/ggplot-1.png" width="672" /></p>
 <p>loess 추세선과 함께 살펴보면, 네이버 뉴스창의 (랭킹 배너 일간 조회수 top30 기사 한정) 댓글 수는 꾸준히 감소해 온 것을 알 수 있다. 다만 올해 들어 코로나 사태 영향으로 댓글창이 일시적으로 활발해진 추세도 함께 엿볼 수 있다. 이렇듯 꾸준한 감소세는 앞서 살펴 본 위키백과 항목의 대통령 지지율의 꾸준한 감소와 유사한 패턴을 보이지만, 이 두 가지 현상, 즉 현 대통령의 레임덕과 (이유 모를) 네이버 댓글창의 비활성화가 유의미한 상관관계를 갖는 사회적 현상인지는 의문이다.</p>
 </div>
 <div id="문재앙-지수-만들기-3-인사이트-파악-후-산출식-수정" class="section level2">
@@ -526,14 +437,14 @@ plot(Summary.df$disaster, Summary.df.2$잘못한다, main = &quot;문재앙 지�
 plot(Summary.df$sinner, Summary.df.2$잘못한다, main = &quot;문죄인 지수&quot;)
 plot(Summary.df$islam, Summary.df.2$잘못한다, main = &quot;문슬람 지수&quot;)
 plot(Summary.df$head, Summary.df.2$잘못한다, main = &quot;대깨문 지수&quot;)</code></pre>
-<p><img src="/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <pre class="r"><code>## Option 3
 par(mfrow = c(2, 2))
 plot(Summary.df.2$disaster, Summary.df.2$잘못한다, main = &quot;문재앙 지수&quot;)
 plot(Summary.df.2$sinner, Summary.df.2$잘못한다, main = &quot;문죄인 지수&quot;)
 plot(Summary.df.2$islam, Summary.df.2$잘못한다, main = &quot;문슬람 지수&quot;)
 plot(Summary.df.2$head, Summary.df.2$잘못한다, main = &quot;대깨문 지수&quot;)</code></pre>
-<p><img src="/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-05-presidential-excitable-speech-analysis-1_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>어떤 지수를 활용할 지는 우리 마음이지만, 나는 가장 단순한 2번 산출식과 estimate가 가장 높은 항목을 도출한 3번 산출식 이 두 가지 지표를 모두 활용해서 각각 시각화해보기로 했다. 본격적인 시각화와 상응하는 주관적 분석에 대해서는 다음 게시물에서 다루도록 하겠다.</p>
 <p><mark>(2편에 계속)</mark></p>
 <style>
@@ -546,40 +457,3 @@ body {
 </div>
 </div>
 </div>
-
-
-</article>
-
-
-<section class="post-nav">
-    <ul>
-        
-        <li>
-            <a href="/posts/sotu-text-analysis/"><i class="fa fa-chevron-circle-left"></i> SOTU Text Analysis</a>
-        </li>
-        
-        
-        <li>
-            <a href="/posts/presidential-excitable-speech-analysis_2/">Presidential excitable speech analysis (2) <i class="fa fa-chevron-circle-right"></i> </a>
-        </li>
-        
-    </ul>
-</section>
-    
-
-
-
-
-
-</main>
-    <footer>
-        <h6>Copyright © 2019 - Joahn |
-            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
-            <a href="/index.xml">Subscribe</a></h6>
-    </footer>
-</div>
-<script src="/js/scripts.js"></script>
-
-</body>
-
-</html>

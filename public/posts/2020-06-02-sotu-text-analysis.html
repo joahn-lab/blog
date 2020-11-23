@@ -1,102 +1,11 @@
-<!doctype html>
+---
+title: "SOTU Text Analysis"
+author: "joahn-lab"
+date: '2020-05-01'
+slug: sotu-text-analysis
+output: html_document
+---
 
-<html lang="en">
-
-<head>
-  <title>Joahn-lab</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="The HTML5 Herald" />
-  <meta name="author" content="joahn-lab" /><meta name="generator" content="Hugo 0.78.2" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
-  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
-  <link rel="stylesheet" type="text/css" href="/css/styles.css" /></head>
-
-<body>
-  <div id="container">
-    <header>
-      <h1>
-                <a href="/">Joahn-lab</a>
-            </h1>
-
-      <ul id="social-media">
-        
-        
-          
-        <li><a href="https://github.com/joahn-lab"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
-           
-        <li><a href="https://instagram.com/babyblu_deepdown"><i class="fab fa-instagram fa-lg" aria-hidden="true"></i></a></li>
-        
-      </ul>
-      
-      <p><em>All we want is around us</em></p>
-      
-    </header>
-
-    
-<nav>
-    <ul>
-        
-        <li>
-            <a class="" href="/posts/">
-                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="/resume/">
-                <i class="fa-li fa  fa-lg"></i><span>Resume</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="/about/">
-                <i class="fa-li fa  fa-lg"></i><span>About</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="https://github.com/joahn-lab">
-                <i class="fa-li fa  fa-lg"></i><span>GitHub</span>
-            </a>
-        </li>
-        
-        <li>
-            <a class="" href="https://instagram.com/babyblu_deepdown">
-                <i class="fa-li fa  fa-lg"></i><span>Instagram</span>
-            </a>
-        </li>
-        
-    </ul>
-</nav>
-
-    <main>
-
-
-
-
-<article>
-
-    <h1>SOTU Text Analysis</h1>
-
-    
-        <aside>
-    <ul>
-        <li>
-            <time class="post-date" datetime="2020-05-01T00:00:00Z">May 1, 2020</time>
-        </li>
-        
-
-        
-
-        <li>8 minutes read</li>
-    </ul>
-</aside>
-
-    
-
-    
 <link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
 <script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 
@@ -303,7 +212,7 @@ A3_1 %&gt;%
                      labels=A3_1$president) +
   theme(axis.text.x.bottom = element_text(angle = 45)) +
   theme_light()</code></pre>
-<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>이때, 대통령별 변화량에 주목하기보다 시대 변화에 따른 추이를 보고 싶다면 축을 세로로 돌리면 좀 더 보기 편할 것이다. ggplot 패키지의 coord_flip() 함수를 이용하면 된다. 추가적으로 추세선과 함께 그래프를 보면 전반적인 추이를 검토하기 더욱 편할 것이다. 이때 추세선은 전반적이고 유동적인 추이를 시각화하여 제공하고자 함이 주 사용목적이므로 geom_smooth(method = ‘loess’)를 이용하자.</p>
 <pre class="r"><code>A3_1 %&gt;%
   ggplot(aes(x = 46-president_no, y = value)) +
@@ -318,7 +227,7 @@ A3_1 %&gt;%
   coord_flip() +
   theme_light()</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>당시 미국의 역사적 흐름과 결부해 위와 같이 평균 단어 수가 변화하는 추세를 분석해보면 다음과 같다.
 개국부터 남북전쟁, 독립전쟁 및 노예제 폐지를 지나 20세기 초반의 경제 호황기에 접어들기까지 미국은 정치 부문의 민주적 발전과 경제 부문의 양적 팽창을 도모해 왔다. 이에 따라 대통령은 자신의 국정 연설에 국가가 나아갈 방향에 대한 제언 등 여러 강조 사항을 담고자 했을 것이다. 그런데, 27대 대통령 윌리엄 태프트 재임 기간에서 28대 대통령 우드로 윌슨 재임 기간으로 넘어가는 지점에서는 평균 단어 수의 추이가 급감하는데, 그 이유는 앞서 언급한 역사적 맥락과 비교해 훨씬 명확하다. USCB(Univ. Santa Barbara)의 한 에세이에 따르면, 3대 대통령 토머스 제퍼슨부터 28대 대통령 우드로 윌슨 대통령 직전까지 이어져 온 서면(written) 연설 방식이 구두(oral) 연설 방식으로 바뀐 것이다. 구두로 연설하는 탓에 연설문당 단어 수가 기존과 같이 2만 개를 넘기기는 어려웠을 것이며, 따라서 연설문 분량은 발언하기 적당한 정도로 조정되어야 했을 것이다.
 또한, 33대 대통령 해리 트루먼 이래로는 연설이 TV로 방송되기 시작해 훨씬 다양한 계층에 분포한 대중들도 연설을 접할 수 있게 되었다. 따라서 문장은 이전보다 쉽고 간결해져야 했을 것이며 연설 분량은 평균화되어, 이에 평균 단어 수는 일정량에 수렴하게 되었을 것이다.</p>
@@ -348,7 +257,7 @@ A4_1 %&gt;%
   coord_flip() +
   theme_light()</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="public/posts/2020-06-02-sotu-text-analysis_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>우리는 여기서 시대에 따른 ‘우리’ 어휘 사용의 일정한 경향성을 파악할 수 있다.</p>
 <div id="주관적-해석" class="section level2">
 <h2>주관적 해석</h2>
@@ -357,40 +266,3 @@ A4_1 %&gt;%
 이러한 사회적 맥락 속에서 대통령들은 ‘우리’라는 대명사를 빈번히 사용하여 예상 청자인 시민들과의 친밀감 혹은 시민들의 정치적 소속감을 유도하고, 궁극적으로 자신들의 권력 행사에 대한 정당성을 안전하게 보장받고자 했을 것이다.</p>
 </div>
 </div>
-
-
-</article>
-
-
-<section class="post-nav">
-    <ul>
-        
-        <li>
-            <a href="/posts/spatial-data/"><i class="fa fa-chevron-circle-left"></i> Spatial data in golden time project</a>
-        </li>
-        
-        
-        <li>
-            <a href="/posts/presidential-excitable-speech-analysis_1/">Presidential excitable speech analysis (1) <i class="fa fa-chevron-circle-right"></i> </a>
-        </li>
-        
-    </ul>
-</section>
-    
-
-
-
-
-
-</main>
-    <footer>
-        <h6>Copyright © 2019 - Joahn |
-            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
-            <a href="/index.xml">Subscribe</a></h6>
-    </footer>
-</div>
-<script src="/js/scripts.js"></script>
-
-</body>
-
-</html>
